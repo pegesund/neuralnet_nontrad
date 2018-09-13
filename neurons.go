@@ -61,9 +61,9 @@ func init_random(layers []int) {
 					synapses[k].weight = get_random_val()
 					synapses[k].incSize = get_random_val() / 10
 					if rand.Intn(2) == 1 {
-						synapses[k].direction = 1
+						synapses[k].direction = Increase
 					} else {
-						synapses[k].direction = -1
+						synapses[k].direction = Decrease
 					}
 				}
 				layer.layer[j].synapses = synapses
