@@ -40,6 +40,10 @@ func see_net(net net) {
 	pretty.Println(net)
 }
 
+/*
+	update neurone weights, directions and inc_size with random values
+*/
+
 func get_random_val() float64 {
 	return rand.Float64()
 }
@@ -61,7 +65,6 @@ func init_random(layers []int) {
 					} else {
 						synapses[k].direction = -1
 					}
-
 				}
 				layer.layer[j].synapses = synapses
 			} else {
