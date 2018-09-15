@@ -1,6 +1,5 @@
 package main
 
-
 const (
 	Increase float64 = 1
 	Decrease float64 = -1
@@ -26,21 +25,22 @@ type layer struct {
 }
 
 type net struct {
-	layers []layer
-	bias   float64
+	layers      []layer
+	bias        float64
 	mutationInc float64
+	children    []net
 }
 
 type trainingset struct {
-	in []float64
+	in  []float64
 	out []float64
 }
 
 type training struct {
-	net *net
-	tSet *trainingset
-	traningSize int
-	threads int
-	bucketSize int
-	errSize float64
+	net          *net
+	tSet         *trainingset
+	trainingSize int
+	threads      int
+	bucketSize   int
+	errSize      float64
 }

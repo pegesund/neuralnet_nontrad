@@ -34,8 +34,8 @@ func seeInputOutput(net net) {
 }
 
 // creates and initiates net with random values
-func initRandom(layers []int, bias float64) *net {
-	var net = net{make([]layer, len(layers)), bias, 1}
+func initRandom(layers []int, bias float64, children []net) *net {
+	var net = net{make([]layer, len(layers)), bias, 1, children}
 	for i := 0; i < len(layers); i++ {
 		layerLen := layers[i]
 		layer := layer{make([]neuron, layerLen)}
@@ -67,7 +67,7 @@ func initRandom(layers []int, bias float64) *net {
 
 func cloneNet(oldNet *net) *net {
 	treeSize := len(oldNet.layers)
-	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc}
+	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, nil}
 	for i := 0; i < treeSize; i++ {
 		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
 		newNet.layers[i] = layer
@@ -139,12 +139,13 @@ func updateValues(net *net) {
 	fmt.Println("Updated network")
 }
 
-
 func benchmarkClone(net *net) {
 	start := time.Now()
 	for i := 0; i < 10000000; i++ {
 		t2 := cloneNet(net)
-		if (t2.bias ==3 ) { fmt.Println("OJ")}
+		if t2.bias == 3 {
+			fmt.Println("OJ")
+		}
 	}
 	elapsed := time.Since(start)
 	fmt.Printf("\n Time took %s", elapsed)
@@ -153,13 +154,12 @@ func benchmarkClone(net *net) {
 
 func main() {
 	layers := []int{3, 2}
-	mynet := initRandom(layers[:], 0)
+	mynet := initRandom(layers[:], 0, nil)
 	setInput(mynet, []float64{1, 2, 3})
 	updateValues(mynet)
 	seeNet(*mynet)
 	fmt.Println("--------------")
-	adjustNet(mynet)
+	adjustNetWeights(mynet)
 	seeNet(*mynet)
 	// seeInputOutput(*mynet)
 }
-
