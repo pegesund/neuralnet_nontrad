@@ -1,11 +1,10 @@
 package main
 
-type Direction int
 
 const (
-	Increase Direction = 0
-	Decrease Direction = 1
-	Stay     Direction = 2
+	Increase float64 = 1
+	Decrease float64 = -1
+	Stay     float64 = 2
 )
 
 // data structures
@@ -13,7 +12,7 @@ const (
 
 type synapse struct {
 	weight    float64
-	direction Direction
+	direction float64
 	incSize   float64
 }
 
@@ -29,4 +28,19 @@ type layer struct {
 type net struct {
 	layers []layer
 	bias   float64
+	mutationInc float64
+}
+
+type trainingset struct {
+	in []float64
+	out []float64
+}
+
+type training struct {
+	net *net
+	tSet *trainingset
+	traningSize int
+	threads int
+	bucketSize int
+	errSize float64
 }
