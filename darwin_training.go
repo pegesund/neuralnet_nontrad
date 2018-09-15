@@ -60,7 +60,7 @@ func adjustNetWeights(net *net) {
 // spawn number of threads to do training in
 func train(training *training) {
 	for w := 1; w <= training.threads; w++ {
-		go trainWorker()
+		go trainTreeWorker()
 	}
 }
 
