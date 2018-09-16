@@ -34,19 +34,18 @@ func seeInputOutput(net net) {
 }
 
 // creates and initiates net with random values
-func initRandom(layers []int, bias float64, children []net) *net {
-	var net = net{make([]layer, len(layers)), bias, 1, children}
-	for i := 0; i < len(layers); i++ {
-		layerLen := layers[i]
+func initRandom(layersInfo []int, bias float64, children []*net) *net {
+	var net = net{make([]layer, len(layersInfo)), bias, 1, children, layersInfo}
+	for i := 0; i < len(layersInfo); i++ {
+		layerLen := layersInfo[i]
 		layer := layer{make([]neuron, layerLen)}
 		for j, _ := range layer.neurons {
 			layer.neurons[j].val = 0
 			if i < len(net.layers)-1 {
-				fmt.Println(i)
-				synapses := make([]synapse, layers[i+1])
+				synapses := make([]synapse, layersInfo[i+1])
 				for k, _ := range synapses {
 					synapses[k].weight = randomVal()
-					synapses[k].incSize = 1 + (randomVal() / 10)
+					synapses[k].incSize = randomVal() / 10
 					if rand.Intn(2) == 1 {
 						synapses[k].direction = Increase
 					} else {
@@ -67,7 +66,7 @@ func initRandom(layers []int, bias float64, children []net) *net {
 
 func cloneNet(oldNet *net) *net {
 	treeSize := len(oldNet.layers)
-	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, nil}
+	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, nil, oldNet.layersInfo}
 	for i := 0; i < treeSize; i++ {
 		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
 		newNet.layers[i] = layer
@@ -153,13 +152,18 @@ func benchmarkClone(net *net) {
 }
 
 func main() {
-	layers := []int{3, 2}
-	mynet := initRandom(layers[:], 0, nil)
-	setInput(mynet, []float64{1, 2, 3})
+	layersInfo := []int{3, 2}
+	// mynet := initRandom(layersInfo[:], 0, nil)
+	/* setInput(mynet, []float64{1, 2, 3})
 	updateValues(mynet)
 	seeNet(*mynet)
 	fmt.Println("--------------")
 	adjustNetWeights(mynet)
 	seeNet(*mynet)
-	// seeInputOutput(*mynet)
+	seeInputOutput(*mynet)
+	*/
+	wood := createWood(3, layersInfo, 0)
+	fmt.Println(wood)
+	createNetChildren(3, 0, wood.nets, 4)
+
 }

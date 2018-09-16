@@ -28,17 +28,22 @@ type net struct {
 	layers      []layer
 	bias        float64
 	mutationInc float64
-	children    []net
+	children    []*net
+	layersInfo  []int
 }
 
-type trainingset struct {
-	in  []float64
-	out []float64
+type wood struct {
+	nets      []*net
+	diversity int
+}
+
+type trainingSet struct {
+	in  [][]float64
+	out [][]float64
 }
 
 type training struct {
-	net          *net
-	tSet         *trainingset
+	tSet         *[]trainingSet
 	trainingSize int
 	threads      int
 	bucketSize   int
