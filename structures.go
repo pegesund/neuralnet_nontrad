@@ -30,6 +30,7 @@ type net struct {
 	mutationInc float64
 	children    []*net
 	layersInfo  []int
+	error		float64
 }
 
 type wood struct {
@@ -43,9 +44,9 @@ type trainingSet struct {
 }
 
 type training struct {
-	tSet         *[]trainingSet
-	trainingSize int
+	tSet         *trainingSet
+	rndSize		 int
 	threads      int
-	bucketSize   int
 	errSize      float64
+	swapInter	 int
 }

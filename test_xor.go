@@ -1,14 +1,21 @@
 package main
 
-import "fmt"
+/*
+type training struct {
+	tSet         *[]trainingSet
+	rndSize		 int
+	threads      int
+	errSize      float64
+	swapInter	 int
+}
+ */
 
-// generate xor for all numbers from 255
-// input in the binary 1 or one for each byte
-
-// generates bit values
-func testXor() {
+// text xor
+// one hiput layer of size 2, one hidden layer of size 2, and one output layer of size 1
+func testXor() (*training){
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
-	traningSet := trainingSet{in, out}
-	fmt.Println("trainingset", traningSet)
+	tSet := trainingSet{in, out}
+	training := training{&tSet, 0, 0, 0, 1000000000}
+	return &training
 }

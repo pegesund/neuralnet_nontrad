@@ -22,8 +22,43 @@ func trainTreeWorker() {
 	}
 }
 
-func createCloneMutateAndEvaluate(net *net, ts *trainingSet) {
 
+// creates average
+func averageErrorInNet(set *trainingSet, net *net) (float64){
+	sumErr := 0.0
+	for i :=0; i < len(set.in); i++ {
+		setInput(net, set.in[i])
+		updateValues(net)
+		sumErr += calcError(net, set.out[i])
+	}
+	e := sumErr / float64(len(set.in))
+	net.error = e
+	return e
+}
+
+
+// creates clones of a net and keeps the winner
+// scores agains the hole traning net
+// returns the winning net
+func createCloneMutateAndEvaluate(net *net, training *training) (*net){
+	winner := &net
+	updateValues(net)
+	netAvgErr := averageErrorInNet(training.tSet, net)
+	for i := 0; i < training.swapInter && i < 3000000; i++ {
+		clone := cloneNet(net)
+		permuteNet(clone)
+		updateValues(clone)
+		cloneAvgErr := averageErrorInNet(training.tSet, clone)
+		if (cloneAvgErr < netAvgErr) {
+			winner = &clone
+			netAvgErr = cloneAvgErr
+			fmt.Printf("%d New winner %f \n: ", i, cloneAvgErr)
+			// pretty.Println(winner)
+			}
+	}
+	netPtr := &net
+	*netPtr = *winner
+	return *winner
 }
 
 // permute the net

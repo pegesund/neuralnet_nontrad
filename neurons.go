@@ -35,7 +35,7 @@ func seeInputOutput(net net) {
 
 // creates and initiates net with random values
 func initRandom(layersInfo []int, bias float64, children []*net) *net {
-	var net = net{make([]layer, len(layersInfo)), bias, 1, children, layersInfo}
+	var net = net{make([]layer, len(layersInfo)), bias, 1, children, layersInfo, 0}
 	for i := 0; i < len(layersInfo); i++ {
 		layerLen := layersInfo[i]
 		layer := layer{make([]neuron, layerLen)}
@@ -62,11 +62,21 @@ func initRandom(layersInfo []int, bias float64, children []*net) *net {
 	return &net
 }
 
+func predict(input []float64, net *net) {
+	setInput(net, input)
+	updateValues(net)
+	fmt.Println("----")
+	seeInputOutput(*net)
+	fmt.Println("====")
+	fmt.Println("Error: ", net.error)
+}
+
+
 // clones a neural network
 
 func cloneNet(oldNet *net) *net {
 	treeSize := len(oldNet.layers)
-	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, nil, oldNet.layersInfo}
+	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, nil, oldNet.layersInfo, 0}
 	for i := 0; i < treeSize; i++ {
 		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
 		newNet.layers[i] = layer
@@ -93,14 +103,19 @@ func activateSigmoid(val float64) float64 {
 	return 1 / (1 + math.Exp(-val))
 }
 
+func activateTanh(val float64) float64 {
+	return 1 - math.Pow(math.Tanh(val), 2)
+}
+
 // minimize this function from movement to movement
 
 func calcError(net *net, expectedResult []float64) float64 {
 	netSize := len(net.layers)
 	var e float64 = 0
 	for i := 0; i < len(net.layers[netSize-1].neurons); i++ {
-		e += math.Pow(expectedResult[i]-net.layers[0].neurons[i].val, 2)
+		e += math.Pow(expectedResult[i]-net.layers[netSize - 1].neurons[i].val, 2)
 	}
+	net.error = e
 	return e
 }
 
@@ -112,7 +127,7 @@ func setInput(net *net, input []float64) {
 	}
 }
 
-// update valus in higher layers based on weight
+// update values in higher layers based on weight
 // standard feed forward
 
 func updateValues(net *net) {
@@ -131,11 +146,10 @@ func updateValues(net *net) {
 				neuronBelow := &net.layers[i-1].neurons[k]
 				sum += neuronBelow.synapses[j].weight * neuronBelow.val
 			}
-			net.layers[i].neurons[j].val = activateSigmoid(sum)
+			net.layers[i].neurons[j].val = activateTanh(sum)
 		}
 	}
-	seeNet(*net)
-	fmt.Println("Updated network")
+	// seeNet(*net)
 }
 
 func benchmarkClone(net *net) {
@@ -152,7 +166,8 @@ func benchmarkClone(net *net) {
 }
 
 func main() {
-	layersInfo := []int{3, 2}
+	rand.Seed(time.Now().UTC().UnixNano())
+	layersInfo := []int{2, 3, 3, 3, 3, 1}
 	// mynet := initRandom(layersInfo[:], 0, nil)
 	/* setInput(mynet, []float64{1, 2, 3})
 	updateValues(mynet)
@@ -164,6 +179,14 @@ func main() {
 	*/
 	wood := createWood(3, layersInfo, 0)
 	fmt.Println(wood)
-	createNetChildren(3, 0, wood.nets, 4)
+	// createNetChildren(3, 0, wood.nets, 4)
+	tSet := testXor()
+	net := cloneNet(wood.nets[0])
+	net = createCloneMutateAndEvaluate(net, tSet)
+	predict([]float64{0, 0}, net)
+	predict([]float64{1, 0}, net)
+	predict([]float64{0, 1}, net)
+	predict([]float64{1, 1}, net)
+	fmt.Println(wood)
 
 }
