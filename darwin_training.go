@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"sync/atomic"
 )
 
 /*
@@ -11,6 +12,7 @@ import (
 
 */
 
+var winners uint64 = 0
 var treeJobs = make(chan *training, 100)
 var results = make(chan *training, 100)
 
@@ -56,7 +58,7 @@ func createCloneMutateAndEvaluate(net *net, training *training) *net {
 			winner = &clone
 			netAvgErr = cloneAvgErr
 			fmt.Printf("%d New winner %f \n: ", i, cloneAvgErr)
-			// pretty.Println(winner)
+			atomic.AddUint64(&winners, 1)
 		}
 	}
 	netPtr := &net

@@ -171,7 +171,7 @@ func benchmarkClone(net *net) {
 func main() {
 	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
-	layersInfo := []int{2, 300, 50, 1}
+	layersInfo := []int{2, 3, 3, 1}
 	// mynet := initRandom(layersInfo[:], 0, nil)
 	/* setInput(mynet, []float64{1, 2, 3})
 	updateValues(mynet)
@@ -193,5 +193,6 @@ func main() {
 	predict([]float64{1, 1}, net)
 	fmt.Println(wood)
 	elapsed := time.Since(start)
+	fmt.Println("Winners: ", winners)
 	fmt.Printf("\n Time took %s", elapsed)
 }
