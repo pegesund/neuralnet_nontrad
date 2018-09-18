@@ -71,7 +71,6 @@ func predict(input []float64, net *net) {
 	fmt.Println("Error: ", net.error)
 }
 
-
 // clones a neural network
 
 func cloneNet(oldNet *net) *net {
@@ -104,6 +103,10 @@ func activateSigmoid(val float64) float64 {
 }
 
 func activateTanh(val float64) float64 {
+	return math.Tanh(val)
+}
+
+func activateTanhDeriv(val float64) float64 {
 	return 1 - math.Pow(math.Tanh(val), 2)
 }
 
@@ -113,7 +116,7 @@ func calcError(net *net, expectedResult []float64) float64 {
 	netSize := len(net.layers)
 	var e float64 = 0
 	for i := 0; i < len(net.layers[netSize-1].neurons); i++ {
-		e += math.Pow(expectedResult[i]-net.layers[netSize - 1].neurons[i].val, 2)
+		e += math.Pow(expectedResult[i]-net.layers[netSize-1].neurons[i].val, 2)
 	}
 	net.error = e
 	return e
@@ -166,8 +169,9 @@ func benchmarkClone(net *net) {
 }
 
 func main() {
+	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
-	layersInfo := []int{2, 3, 3, 3, 3, 1}
+	layersInfo := []int{2, 300, 50, 1}
 	// mynet := initRandom(layersInfo[:], 0, nil)
 	/* setInput(mynet, []float64{1, 2, 3})
 	updateValues(mynet)
@@ -188,5 +192,6 @@ func main() {
 	predict([]float64{0, 1}, net)
 	predict([]float64{1, 1}, net)
 	fmt.Println(wood)
-
+	elapsed := time.Since(start)
+	fmt.Printf("\n Time took %s", elapsed)
 }
