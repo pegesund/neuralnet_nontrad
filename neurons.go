@@ -34,8 +34,8 @@ func seeInputOutput(net net) {
 }
 
 // creates and initiates net with random values
-func initRandom(layersInfo []int, bias float64, layersActivate []func(float64) float64) *net {
-	var net = net{make([]layer, len(layersInfo)), bias, 1, layersInfo, layersActivate, 0}
+func initRandom(layersInfo []int, bias float64, layersActivate []func(float64) float64, layersActivateVals []ActivationFunction) *net {
+	var net = net{make([]layer, len(layersInfo)), bias, 1, layersInfo, layersActivate, layersActivateVals, 0}
 	for i := 0; i < len(layersInfo); i++ {
 		layerLen := layersInfo[i]
 		layer := layer{make([]neuron, layerLen)}
@@ -76,7 +76,7 @@ func predict(input []float64, net *net) {
 func cloneNet(oldNet *net) *net {
 	treeSize := len(oldNet.layers)
 	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, oldNet.layersLength,
-		oldNet.layersActivate, 0}
+		oldNet.layersActivate, oldNet.layersActVal, 0}
 	for i := 0; i < treeSize; i++ {
 		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
 		newNet.layers[i] = layer
@@ -98,14 +98,6 @@ func cloneNet(oldNet *net) *net {
 
 // activation function is play sigmoid
 // try out: https://towardsdatascience.com/activation-functions-neural-networks-1cbd9f8d91d6
-
-func activateSigmoid(val float64) float64 {
-	return 1 / (1 + math.Exp(-val))
-}
-
-func activateTanh(val float64) float64 {
-	return math.Tanh(val)
-}
 
 // minimize this function from movement to movement
 
@@ -148,6 +140,16 @@ func updateValues(net *net) {
 			}
 			net.layers[i].neurons[j].val = net.layersActivate[i](sum)
 		}
+
+		if net.layersActVal[i] == SoftMax {
+			softMaxSum := 0.0
+			for k := 0; k < len(net.layers[i].neurons); k++ {
+				softMaxSum += net.layers[i].neurons[k].val
+			}
+			for k := 0; k < len(net.layers[i].neurons); k++ {
+				net.layers[i].neurons[k].val = net.layers[i].neurons[k].val / softMaxSum
+			}
+		}
 	}
 	// seeNet(*net)
 }
@@ -169,7 +171,7 @@ func main() {
 	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
 	layersLength := []int{2, 3, 3, 1}
-	layersActivate := []string{"tanh", "tanh", "tanh", "tanh"}
+	layersActivate := []ActivationFunction{Tanh, Tanh, Tanh, Tanh}
 	// mynet := initRandom(layersLength[:], 0, nil)
 	/* setInput(mynet, []float64{1, 2, 3})
 	updateValues(mynet)

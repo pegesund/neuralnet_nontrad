@@ -30,6 +30,7 @@ type net struct {
 	mutationInc    float64
 	layersLength   []int
 	layersActivate []func(float64) float64
+	layersActVal   []ActivationFunction
 	error          float64
 }
 
