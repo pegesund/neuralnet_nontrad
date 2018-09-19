@@ -34,8 +34,8 @@ func seeInputOutput(net net) {
 }
 
 // creates and initiates net with random values
-func initRandom(layersInfo []int, bias float64, children []*net) *net {
-	var net = net{make([]layer, len(layersInfo)), bias, 1, children, layersInfo, 0}
+func initRandom(layersInfo []int, bias float64) *net {
+	var net = net{make([]layer, len(layersInfo)), bias, 1, layersInfo, 0}
 	for i := 0; i < len(layersInfo); i++ {
 		layerLen := layersInfo[i]
 		layer := layer{make([]neuron, layerLen)}
@@ -75,7 +75,7 @@ func predict(input []float64, net *net) {
 
 func cloneNet(oldNet *net) *net {
 	treeSize := len(oldNet.layers)
-	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, nil, oldNet.layersInfo, 0}
+	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, oldNet.layersInfo, 0}
 	for i := 0; i < treeSize; i++ {
 		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
 		newNet.layers[i] = layer

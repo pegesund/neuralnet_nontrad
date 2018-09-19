@@ -28,9 +28,8 @@ type net struct {
 	layers      []layer
 	bias        float64
 	mutationInc float64
-	children    []*net
 	layersInfo  []int
-	error		float64
+	error       float64
 }
 
 type wood struct {
@@ -44,9 +43,9 @@ type trainingSet struct {
 }
 
 type training struct {
-	tSet         *trainingSet
-	rndSize		 int
-	threads      int
-	errSize      float64
-	swapInter	 int
+	tSet      *trainingSet
+	rndSize   int
+	threads   int
+	errSize   float64
+	swapInter int
 }

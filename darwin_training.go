@@ -98,29 +98,10 @@ func train(training *training) {
 	}
 }
 
-// creates childrens recursively
-// for each depth minimize the mutationInc and lower the genetic difference
-
-func createNetChildren(depth int, currentDepth int, nets []*net, diversity int) {
-	for i := 0; i < len(nets); i++ {
-		children := make([]*net, diversity)
-		for j := 0; j < diversity; j++ {
-			clone := cloneNet(nets[i])
-			clone.mutationInc = nets[i].mutationInc * 0.5
-			permuteNet(clone)
-			children[j] = clone
-		}
-		nets[i].children = children
-		if currentDepth+1 < depth {
-			createNetChildren(depth, currentDepth+1, children, diversity)
-		}
-	}
-}
-
 func createWood(diversity int, layers []int, bias float64) *wood {
 	nets := make([]*net, diversity)
 	for i := 0; i < len(nets); i++ {
-		nets[i] = initRandom(layers[:], bias, nil)
+		nets[i] = initRandom(layers[:], bias)
 	}
 	return &wood{nets, diversity}
 }
