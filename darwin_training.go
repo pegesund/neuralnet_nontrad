@@ -98,10 +98,19 @@ func train(training *training) {
 	}
 }
 
-func createWood(diversity int, layers []int, bias float64) *wood {
+func createWood(diversity int, layers []int, bias float64, layersActivateString []string) *wood {
+	layersActivate := make([]func(float64) float64, len(layers))
+	for i := 0; i < len(layers); i++ {
+		switch layersActivateString[i] {
+		case "tanh":
+			layersActivate[i] = activateTanh
+		case "sigmoid":
+			layersActivate[i] = activateSigmoid
+		}
+	}
 	nets := make([]*net, diversity)
 	for i := 0; i < len(nets); i++ {
-		nets[i] = initRandom(layers[:], bias)
+		nets[i] = initRandom(layers[:], bias, layersActivate)
 	}
 	return &wood{nets, diversity}
 }

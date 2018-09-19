@@ -34,8 +34,8 @@ func seeInputOutput(net net) {
 }
 
 // creates and initiates net with random values
-func initRandom(layersInfo []int, bias float64) *net {
-	var net = net{make([]layer, len(layersInfo)), bias, 1, layersInfo, 0}
+func initRandom(layersInfo []int, bias float64, layersActivate []func(float64) float64) *net {
+	var net = net{make([]layer, len(layersInfo)), bias, 1, layersInfo, layersActivate, 0}
 	for i := 0; i < len(layersInfo); i++ {
 		layerLen := layersInfo[i]
 		layer := layer{make([]neuron, layerLen)}
@@ -75,7 +75,8 @@ func predict(input []float64, net *net) {
 
 func cloneNet(oldNet *net) *net {
 	treeSize := len(oldNet.layers)
-	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, oldNet.layersInfo, 0}
+	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, oldNet.layersLength,
+		oldNet.layersActivate, 0}
 	for i := 0; i < treeSize; i++ {
 		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
 		newNet.layers[i] = layer
@@ -104,10 +105,6 @@ func activateSigmoid(val float64) float64 {
 
 func activateTanh(val float64) float64 {
 	return math.Tanh(val)
-}
-
-func activateTanhDeriv(val float64) float64 {
-	return 1 - math.Pow(math.Tanh(val), 2)
 }
 
 // minimize this function from movement to movement
@@ -149,7 +146,7 @@ func updateValues(net *net) {
 				neuronBelow := &net.layers[i-1].neurons[k]
 				sum += neuronBelow.synapses[j].weight * neuronBelow.val
 			}
-			net.layers[i].neurons[j].val = activateTanh(sum)
+			net.layers[i].neurons[j].val = net.layersActivate[i](sum)
 		}
 	}
 	// seeNet(*net)
@@ -171,8 +168,9 @@ func benchmarkClone(net *net) {
 func main() {
 	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
-	layersInfo := []int{2, 3, 3, 1}
-	// mynet := initRandom(layersInfo[:], 0, nil)
+	layersLength := []int{2, 3, 3, 1}
+	layersActivate := []string{"tanh", "tanh", "tanh", "tanh"}
+	// mynet := initRandom(layersLength[:], 0, nil)
 	/* setInput(mynet, []float64{1, 2, 3})
 	updateValues(mynet)
 	seeNet(*mynet)
@@ -181,7 +179,8 @@ func main() {
 	seeNet(*mynet)
 	seeInputOutput(*mynet)
 	*/
-	wood := createWood(3, layersInfo, 0)
+
+	wood := createWood(3, layersLength, 0, layersActivate)
 	fmt.Println(wood)
 	// createNetChildren(3, 0, wood.nets, 4)
 	tSet := testXor()

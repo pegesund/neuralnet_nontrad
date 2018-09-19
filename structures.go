@@ -25,11 +25,12 @@ type layer struct {
 }
 
 type net struct {
-	layers      []layer
-	bias        float64
-	mutationInc float64
-	layersInfo  []int
-	error       float64
+	layers         []layer
+	bias           float64
+	mutationInc    float64
+	layersLength   []int
+	layersActivate []func(float64) float64
+	error          float64
 }
 
 type wood struct {
