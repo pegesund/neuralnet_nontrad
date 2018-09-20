@@ -171,7 +171,7 @@ func benchmarkClone(net *net) {
 func main() {
 	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
-	testXorSoftMax()
+	// TestXor()
 	elapsed := time.Since(start)
 	fmt.Println("Winners: ", winners)
 	fmt.Printf("\n Time took %s", elapsed)

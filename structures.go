@@ -45,9 +45,10 @@ type trainingSet struct {
 }
 
 type training struct {
-	tSet      *trainingSet
-	rndSize   int
-	threads   int
-	errSize   float64
-	swapInter int
+	tSet            *trainingSet
+	rndSize         int
+	threads         int
+	errSize         float64
+	cloneIterations int
+	errPass         float64
 }

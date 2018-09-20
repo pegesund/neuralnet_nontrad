@@ -46,9 +46,9 @@ func createCloneMutateAndEvaluate(net *net, training *training) *net {
 	winner := &net
 	updateValues(net)
 	netAvgErr := averageErrorInNet(training.tSet, net, 1000)
-	for i := 0; i < training.swapInter && i < 100000; i++ {
+	for i := 0; i < training.cloneIterations && training.errPass < netAvgErr; i++ {
 		if i%1000 == 0 {
-			fmt.Println("Counting: ", i)
+			// fmt.Println("Counting: ", i)
 		}
 		clone := cloneNet(net)
 		permuteNet(clone)
@@ -57,7 +57,7 @@ func createCloneMutateAndEvaluate(net *net, training *training) *net {
 		if cloneAvgErr < netAvgErr {
 			winner = &clone
 			netAvgErr = cloneAvgErr
-			fmt.Printf("%d New winner %f \n: ", i, cloneAvgErr)
+			// fmt.Printf("%d New winner %f \n: ", i, cloneAvgErr)
 			atomic.AddUint64(&winners, 1)
 		}
 	}
