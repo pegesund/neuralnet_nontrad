@@ -102,6 +102,8 @@ func createWood(diversity int, layers []int, bias float64, layersActivateVals []
 	layersActivate := make([]func(float64) float64, len(layers))
 	for i := 0; i < len(layers); i++ {
 		switch layersActivateVals[i] {
+		case Identity:
+			layersActivate[i] = activateIdentity
 		case Tanh:
 			layersActivate[i] = activateTanh
 		case Sigmoid:

@@ -138,6 +138,7 @@ func updateValues(net *net) {
 				neuronBelow := &net.layers[i-1].neurons[k]
 				sum += neuronBelow.synapses[j].weight * neuronBelow.val
 			}
+			// fmt.Println("I is: ", i,net.layersActivate[i] )
 			net.layers[i].neurons[j].val = net.layersActivate[i](sum)
 		}
 
@@ -170,29 +171,7 @@ func benchmarkClone(net *net) {
 func main() {
 	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
-	layersLength := []int{2, 3, 3, 1}
-	layersActivate := []ActivationFunction{Tanh, Tanh, Tanh, Tanh}
-	// mynet := initRandom(layersLength[:], 0, nil)
-	/* setInput(mynet, []float64{1, 2, 3})
-	updateValues(mynet)
-	seeNet(*mynet)
-	fmt.Println("--------------")
-	adjustNetWeights(mynet)
-	seeNet(*mynet)
-	seeInputOutput(*mynet)
-	*/
-
-	wood := createWood(3, layersLength, 0, layersActivate)
-	fmt.Println(wood)
-	// createNetChildren(3, 0, wood.nets, 4)
-	tSet := testXor()
-	net := cloneNet(wood.nets[0])
-	net = createCloneMutateAndEvaluate(net, tSet)
-	predict([]float64{0, 0}, net)
-	predict([]float64{1, 0}, net)
-	predict([]float64{0, 1}, net)
-	predict([]float64{1, 1}, net)
-	fmt.Println(wood)
+	testXorSoftMax()
 	elapsed := time.Since(start)
 	fmt.Println("Winners: ", winners)
 	fmt.Printf("\n Time took %s", elapsed)
