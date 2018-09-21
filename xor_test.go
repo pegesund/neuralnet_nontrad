@@ -23,13 +23,13 @@ func TestXor(t *testing.T) {
 	net = createCloneMutateAndEvaluate(net, &training)
 	assert.True(t, net.error < 0.01, "Error to high in tanh")
 	predict([]float64{0, 0}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.01)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.1)
 	predict([]float64{1, 0}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.99)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.9)
 	predict([]float64{0, 1}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.99)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.9)
 	predict([]float64{1, 1}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.01)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.1)
 	fmt.Println(wood)
 }
 
