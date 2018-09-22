@@ -32,6 +32,7 @@ type net struct {
 	layersActivate []func(float64) float64
 	layersActVal   []ActivationFunction
 	error          float64
+	generation     int
 }
 
 type wood struct {
@@ -46,9 +47,9 @@ type trainingSet struct {
 
 type training struct {
 	tSet            *trainingSet
-	rndSize         int
+	batchSize       int
 	threads         int
-	errSize         float64
+	minGenerations  float64
 	cloneIterations int
 	errPass         float64
 }
