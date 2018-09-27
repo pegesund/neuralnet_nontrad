@@ -12,15 +12,17 @@ import (
 
 */
 
+var maxConcurrent = 100
 var winners uint64 = 0
-var treeJobs = make(chan *training, 100)
-var results = make(chan *training, 100)
+var mutateJobs = make(chan *trainMsg, maxConcurrent)
+var mutateResults = make(chan *trainMsg, maxConcurrent)
 
 // pick training from jobs and pass on to train function
-func trainTreeWorker() {
-	for training := range treeJobs {
+func trainNetWorker() {
+	for tMsg := range mutateJobs {
+		winningNet := createCloneMutateAndEvaluate(tMsg.wood.nets[tMsg.netNumber], tMsg.training)
+		fmt.Println(winningNet)
 
-		fmt.Println(training)
 	}
 }
 
@@ -94,7 +96,7 @@ func permuteNet(net *net) {
 // spawn number of threads to do training in
 func train(training *training) {
 	for w := 1; w <= training.threads; w++ {
-		go trainTreeWorker()
+		go trainNetWorker()
 	}
 }
 
@@ -112,7 +114,7 @@ func createWood(diversity int, layers []int, bias float64, layersActivateVals []
 			layersActivate[i] = activateSoftMax
 		}
 	}
-	nets := make([]*net, diversity)
+	nets := make([]*net, diversity*7)
 	for i := 0; i < len(nets); i++ {
 		nets[i] = initRandom(layers[:], bias, layersActivate, layersActivateVals)
 	}

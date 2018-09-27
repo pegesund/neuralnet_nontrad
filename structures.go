@@ -3,7 +3,6 @@ package main
 const (
 	Increase float64 = 1
 	Decrease float64 = -1
-	Stay     float64 = 2
 )
 
 // data structures
@@ -52,4 +51,10 @@ type training struct {
 	minGenerations  float64
 	cloneIterations int
 	errPass         float64
+}
+
+type trainMsg struct {
+	training  *training
+	wood      *wood
+	netNumber int
 }
