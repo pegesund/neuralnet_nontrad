@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"sort"
 	"sync"
@@ -140,12 +141,26 @@ func createWood(diversity int, layers []int, bias float64, layersActivateVals []
 	return &wood{nets, diversity}
 }
 
+func woodTotalErr(wood *wood, training *training) (total float64) {
+	total = 0.0
+	for i := 0; i < len(wood.nets); i++ {
+		updateValues(wood.nets[i])
+		total += averageErrorInNet(training.tSet, wood.nets[i], math.MaxFloat64)
+		fmt.Print(" ", total, " ")
+	}
+	fmt.Println(" - total: ", total)
+	return
+}
+
 func trainWood(wood *wood, training *training) {
 	// spawn number of threads to do training in
 	for w := 0; w < training.threads; w++ {
 		go trainNetWorker()
 	}
+	woodTotalErr(wood, training)
 	trainOneGeneration(training, wood)
+	sortNetsByErr(wood.nets)
+	woodTotalErr(wood, training)
 
 	sortNetsByErr(wood.nets)
 	fmt.Println("Done with training")
