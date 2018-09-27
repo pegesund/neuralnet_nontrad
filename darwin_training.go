@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"sync"
 	"sync/atomic"
 )
 
@@ -17,7 +18,7 @@ var maxConcurrent = 100
 var winners uint64 = 0
 var mutateJobs = make(chan *trainMsg)
 var mutateResults = make(chan *trainMsg)
-var commands = make(chan string)
+var wg sync.WaitGroup
 
 // pick training from jobs and pass on to train function
 func trainNetWorker() {
@@ -27,14 +28,8 @@ func trainNetWorker() {
 			fmt.Println("Got a job..", tMsg)
 			tMsg.wood.nets[tMsg.netNumber] = createCloneMutateAndEvaluate(tMsg.wood.nets[tMsg.netNumber], tMsg.training)
 			go func() { mutateResults <- tMsg }()
+			wg.Done()
 			fmt.Println("Done with job")
-		case command := <-commands:
-			if command == "die" {
-				fmt.Println("Thread was killed")
-				return
-			} else {
-				fmt.Println("Unknow command: ", command)
-			}
 		}
 	}
 }
@@ -113,13 +108,14 @@ func sortNetsByErr(nets []*net) {
 }
 
 func trainOneGeneration(training *training, wood *wood) {
-
+	wg.Add(len(wood.nets))
 	for i := 0; i < len(wood.nets); i++ {
 		mutateJobs <- &trainMsg{training, wood, i}
 	}
 	for i := 0; i < len(wood.nets); i++ {
 		<-mutateResults
 	}
+	wg.Wait()
 
 }
 
@@ -150,11 +146,6 @@ func trainWood(wood *wood, training *training) {
 		go trainNetWorker()
 	}
 	trainOneGeneration(training, wood)
-	// kill all worker threads
-	for w := 0; w < training.threads; w++ {
-		commands <- "die"
-	}
-	close(commands)
 
 	sortNetsByErr(wood.nets)
 	fmt.Println("Done with training")
