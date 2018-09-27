@@ -145,8 +145,9 @@ func woodTotalErr(wood *wood, training *training) (total float64) {
 	total = 0.0
 	for i := 0; i < len(wood.nets); i++ {
 		updateValues(wood.nets[i])
-		total += averageErrorInNet(training.tSet, wood.nets[i], math.MaxFloat64)
-		fmt.Print(" ", total, " ")
+		e := averageErrorInNet(training.tSet, wood.nets[i], math.MaxFloat64)
+		total += e
+		fmt.Print(" ", e, " ")
 	}
 	fmt.Println(" - total: ", total)
 	return
