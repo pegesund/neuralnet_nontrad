@@ -169,10 +169,24 @@ func benchmarkClone(net *net) {
 	fmt.Println(runtime.NumCPU())
 }
 
+func main3() {
+	layersLength := []int{2, 3, 3, 1}
+	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
+	wood := createWood(3, layersLength, 0.0, layersActivate)
+	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
+	out := [][]float64{{0}, {1}, {1}, {0}}
+	tSet := trainingSet{in, out}
+	training := training{&tSet, 0, 3, 0, 10000000, 0.00005}
+	trainWood(wood, &training)
+}
+
 func main() {
+	fmt.Println("Ok, starting")
 	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
-	// TestXor()
+	main3()
+	// go func() { commands <- "hupp" }()
+	// fmt.Println(<-commands)
 	elapsed := time.Since(start)
 	fmt.Println("Winners: ", winners)
 	fmt.Printf("\n Time took %s", elapsed)

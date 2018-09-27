@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"sync/atomic"
 )
 
@@ -14,15 +15,27 @@ import (
 
 var maxConcurrent = 100
 var winners uint64 = 0
-var mutateJobs = make(chan *trainMsg, maxConcurrent)
-var mutateResults = make(chan *trainMsg, maxConcurrent)
+var mutateJobs = make(chan *trainMsg)
+var mutateResults = make(chan *trainMsg)
+var commands = make(chan string)
 
 // pick training from jobs and pass on to train function
 func trainNetWorker() {
-	for tMsg := range mutateJobs {
-		winningNet := createCloneMutateAndEvaluate(tMsg.wood.nets[tMsg.netNumber], tMsg.training)
-		fmt.Println(winningNet)
-
+	for {
+		select {
+		case tMsg := <-mutateJobs:
+			fmt.Println("Got a job..", tMsg)
+			tMsg.wood.nets[tMsg.netNumber] = createCloneMutateAndEvaluate(tMsg.wood.nets[tMsg.netNumber], tMsg.training)
+			go func() { mutateResults <- tMsg }()
+			fmt.Println("Done with job")
+		case command := <-commands:
+			if command == "die" {
+				fmt.Println("Thread was killed")
+				return
+			} else {
+				fmt.Println("Unknow command: ", command)
+			}
+		}
 	}
 }
 
@@ -93,11 +106,21 @@ func permuteNet(net *net) {
 	}
 }
 
-// spawn number of threads to do training in
-func train(training *training) {
-	for w := 1; w <= training.threads; w++ {
-		go trainNetWorker()
+func sortNetsByErr(nets []*net) {
+	sort.Slice(nets, func(i, j int) bool {
+		return nets[i].error < nets[j].error
+	})
+}
+
+func trainOneGeneration(training *training, wood *wood) {
+
+	for i := 0; i < len(wood.nets); i++ {
+		mutateJobs <- &trainMsg{training, wood, i}
 	}
+	for i := 0; i < len(wood.nets); i++ {
+		<-mutateResults
+	}
+
 }
 
 func createWood(diversity int, layers []int, bias float64, layersActivateVals []ActivationFunction) *wood {
@@ -119,6 +142,22 @@ func createWood(diversity int, layers []int, bias float64, layersActivateVals []
 		nets[i] = initRandom(layers[:], bias, layersActivate, layersActivateVals)
 	}
 	return &wood{nets, diversity}
+}
+
+func trainWood(wood *wood, training *training) {
+	// spawn number of threads to do training in
+	for w := 0; w < training.threads; w++ {
+		go trainNetWorker()
+	}
+	trainOneGeneration(training, wood)
+	// kill all worker threads
+	for w := 0; w < training.threads; w++ {
+		commands <- "die"
+	}
+	close(commands)
+
+	sortNetsByErr(wood.nets)
+	fmt.Println("Done with training")
 }
 
 func main2() {
