@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/rand"
 	"runtime"
+	"sync/atomic"
 	"time"
 )
 
@@ -75,6 +76,7 @@ func predict(input []float64, net *net) {
 // clones a neural network
 
 func cloneNet(oldNet *net) *net {
+	atomic.AddUint64(&cloneCounter, 1)
 	treeSize := len(oldNet.layers)
 	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, oldNet.layersLength,
 		oldNet.layersActivate, oldNet.layersActVal, 0, 0}
@@ -170,13 +172,13 @@ func benchmarkClone(net *net) {
 }
 
 func main3() {
-	layersLength := []int{2, 3, 3, 1}
+	layersLength := []int{2, 300, 300, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
-	wood := createWood(3, layersLength, 0.0, layersActivate)
+	wood := createWood(10, layersLength, 0.0, layersActivate)
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 3, 0, 10000000, 0.00005}
+	training := training{&tSet, 0, 10, 5, 1000, 0.0, 20}
 	trainWood(wood, &training)
 }
 
@@ -189,5 +191,6 @@ func main() {
 	// fmt.Println(<-commands)
 	elapsed := time.Since(start)
 	fmt.Println("Winners: ", winners)
+	fmt.Println("CloneCounter: ", cloneCounter)
 	fmt.Printf("\n Time took %s", elapsed)
 }

@@ -48,9 +48,10 @@ type training struct {
 	tSet            *trainingSet
 	batchSize       int
 	threads         int
-	minGenerations  float64
+	minGenerations  int
 	cloneIterations int
 	errPass         float64
+	runGenerations  int
 }
 
 type trainMsg struct {

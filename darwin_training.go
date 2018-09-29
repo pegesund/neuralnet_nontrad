@@ -17,6 +17,7 @@ import (
 
 var maxConcurrent = 100
 var winners uint64 = 0
+var cloneCounter uint64 = 0
 var mutateJobs = make(chan *trainMsg)
 var mutateResults = make(chan *trainMsg)
 var wg sync.WaitGroup
@@ -26,11 +27,9 @@ func trainNetWorker() {
 	for {
 		select {
 		case tMsg := <-mutateJobs:
-			fmt.Println("Got a job..", tMsg)
 			tMsg.wood.nets[tMsg.netNumber] = createCloneMutateAndEvaluate(tMsg.wood.nets[tMsg.netNumber], tMsg.training)
 			go func() { mutateResults <- tMsg }()
 			wg.Done()
-			fmt.Println("Done with job")
 		}
 	}
 }
@@ -117,10 +116,12 @@ func trainOneGeneration(training *training, wood *wood) {
 		<-mutateResults
 	}
 	wg.Wait()
-
 }
 
 func createWood(diversity int, layers []int, bias float64, layersActivateVals []ActivationFunction) *wood {
+	if diversity%2 != 0 {
+		diversity++
+	}
 	layersActivate := make([]func(float64) float64, len(layers))
 	for i := 0; i < len(layers); i++ {
 		switch layersActivateVals[i] {
@@ -134,7 +135,7 @@ func createWood(diversity int, layers []int, bias float64, layersActivateVals []
 			layersActivate[i] = activateSoftMax
 		}
 	}
-	nets := make([]*net, diversity*7)
+	nets := make([]*net, diversity)
 	for i := 0; i < len(nets); i++ {
 		nets[i] = initRandom(layers[:], bias, layersActivate, layersActivateVals)
 	}
@@ -147,9 +148,9 @@ func woodTotalErr(wood *wood, training *training) (total float64) {
 		updateValues(wood.nets[i])
 		e := averageErrorInNet(training.tSet, wood.nets[i], math.MaxFloat64)
 		total += e
-		fmt.Print(" ", e, " ")
+		fmt.Printf(" %.13f ( %d )  ", e, wood.nets[i].generation)
 	}
-	fmt.Println(" - total: ", total)
+	fmt.Printf(" - total: %.13f \n", total)
 	return
 }
 
@@ -159,11 +160,28 @@ func trainWood(wood *wood, training *training) {
 		go trainNetWorker()
 	}
 	woodTotalErr(wood, training)
-	trainOneGeneration(training, wood)
-	sortNetsByErr(wood.nets)
-	woodTotalErr(wood, training)
+	for i := 0; i < training.runGenerations; i++ {
+		fmt.Println("----- Iteration: ", i)
+		trainOneGeneration(training, wood)
+		sortNetsByErr(wood.nets)
 
-	sortNetsByErr(wood.nets)
+		netSize := len(wood.nets)
+		for j := 0; j < netSize/2; j++ {
+			if wood.nets[(netSize/2)+j].generation < training.minGenerations {
+				continue
+			}
+			father := rand.Intn(netSize / 2)
+			mother := rand.Intn(netSize / 2)
+			for father == mother {
+				mother = rand.Intn(netSize / 2)
+			}
+			wood.nets[(netSize/2)+j] = mergeNetsRandom(wood.nets[mother], wood.nets[father])
+		}
+		for j := 0; j < netSize; j++ {
+			wood.nets[j].generation++
+		}
+	}
+	woodTotalErr(wood, training)
 	fmt.Println("Done with training")
 }
 
