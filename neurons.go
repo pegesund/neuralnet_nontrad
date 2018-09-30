@@ -172,8 +172,8 @@ func benchmarkClone(net *net) {
 }
 
 func main3() {
-	layersLength := []int{2, 3, 3, 1}
-	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
+	layersLength := []int{2, 3, 3, 3, 3, 1}
+	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
 	wood := createWood(50, layersLength, 0.0, layersActivate)
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
