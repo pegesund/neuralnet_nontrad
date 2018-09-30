@@ -148,7 +148,7 @@ func woodTotalErr(wood *wood, training *training) (total float64) {
 		updateValues(wood.nets[i])
 		e := averageErrorInNet(training.tSet, wood.nets[i], math.MaxFloat64)
 		total += e
-		fmt.Printf(" %.13f ( %d )  ", e, wood.nets[i].generation)
+		fmt.Printf(" %.13f ( %d - %d )  ", e, wood.nets[i].generation, wood.nets[i].netType)
 	}
 	fmt.Printf(" - total: %.13f \n", total)
 	return
@@ -175,8 +175,18 @@ func trainWood(wood *wood, training *training) (bestNet *net) {
 			for father == mother {
 				mother = rand.Intn(netSize / 2)
 			}
-
-			wood.nets[(netSize/2)+j] = mergeNetsRandom(wood.nets[mother], wood.nets[father])
+			if rand.Intn(2) == 1 {
+				wood.nets[(netSize/2)+j] = mergeNetsRandom(wood.nets[mother], wood.nets[father])
+			} else {
+				n := (netSize / 2) + j
+				layers := wood.nets[n].layers
+				layersLen := make([]int, len(layers))
+				for l := 0; l < len(layersLen); l++ {
+					layersLen[l] = len(layers[l].neurons)
+				}
+				wood.nets[n] = initRandom(layersLen, wood.nets[n].bias, wood.nets[n].layersActivate, wood.nets[n].layersActVal)
+				wood.nets[n].netType = NewRandNet
+			}
 		}
 		for j := 0; j < netSize; j++ {
 			wood.nets[j].generation++

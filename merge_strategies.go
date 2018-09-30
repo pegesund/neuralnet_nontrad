@@ -22,5 +22,6 @@ func mergeNetsRandom(mother *net, father *net) *net {
 			}
 		}
 	}
+	child.netType = MergedNet
 	return child
 }

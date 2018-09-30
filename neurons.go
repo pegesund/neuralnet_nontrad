@@ -35,16 +35,16 @@ func seeInputOutput(net net) {
 }
 
 // creates and initiates net with random values
-func initRandom(layersInfo []int, bias float64, layersActivate []func(float64) float64, layersActivateVals []ActivationFunction) *net {
-	var net = net{make([]layer, len(layersInfo)), bias, 1,
-		layersInfo, layersActivate, layersActivateVals, 0, 0}
-	for i := 0; i < len(layersInfo); i++ {
-		layerLen := layersInfo[i]
+func initRandom(layersLen []int, bias float64, layersActivate []func(float64) float64, layersActivateVals []ActivationFunction) *net {
+	var net = net{make([]layer, len(layersLen)), bias, 1,
+		layersLen, layersActivate, layersActivateVals, 0, 0, ClonedNet}
+	for i := 0; i < len(layersLen); i++ {
+		layerLen := layersLen[i]
 		layer := layer{make([]neuron, layerLen)}
 		for j, _ := range layer.neurons {
 			layer.neurons[j].val = 0
 			if i < len(net.layers)-1 {
-				synapses := make([]synapse, layersInfo[i+1])
+				synapses := make([]synapse, layersLen[i+1])
 				for k, _ := range synapses {
 					synapses[k].weight = randomVal()
 					synapses[k].incSize = randomVal() / 10
@@ -79,7 +79,7 @@ func cloneNet(oldNet *net) *net {
 	atomic.AddUint64(&cloneCounter, 1)
 	treeSize := len(oldNet.layers)
 	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, oldNet.layersLength,
-		oldNet.layersActivate, oldNet.layersActVal, 0, 0}
+		oldNet.layersActivate, oldNet.layersActVal, 0, 0, oldNet.netType}
 	for i := 0; i < treeSize; i++ {
 		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
 		newNet.layers[i] = layer
@@ -174,11 +174,11 @@ func benchmarkClone(net *net) {
 func main3() {
 	layersLength := []int{2, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
-	wood := createWood(10, layersLength, 0.0, layersActivate)
+	wood := createWood(20, layersLength, 0.0, layersActivate)
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 10, 500, 1000, 0.0, 20}
+	training := training{&tSet, 0, 10, 5, 3000, 0.0, 300}
 	trainWood(wood, &training)
 }
 

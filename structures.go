@@ -1,8 +1,11 @@
 package main
 
 const (
-	Increase float64 = 1
-	Decrease float64 = -1
+	Increase   float64 = 1
+	Decrease   float64 = -1
+	ClonedNet  int     = 1
+	MergedNet  int     = 2
+	NewRandNet int     = 3
 )
 
 // data structures
@@ -32,6 +35,7 @@ type net struct {
 	layersActVal   []ActivationFunction
 	error          float64
 	generation     int
+	netType        int
 }
 
 type wood struct {
