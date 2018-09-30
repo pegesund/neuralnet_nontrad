@@ -174,11 +174,11 @@ func benchmarkClone(net *net) {
 func main3() {
 	layersLength := []int{2, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
-	wood := createWood(20, layersLength, 0.0, layersActivate)
+	wood := createWood(50, layersLength, 0.0, layersActivate)
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 10, 5, 3000, 0.0, 300}
+	training := training{&tSet, 0, 10, 7, 300, 0.0, 200}
 	trainWood(wood, &training)
 }
 
