@@ -154,7 +154,7 @@ func woodTotalErr(wood *wood, training *training) (total float64) {
 	return
 }
 
-func trainWood(wood *wood, training *training) {
+func trainWood(wood *wood, training *training) (bestNet *net) {
 	// spawn number of threads to do training in
 	for w := 0; w < training.threads; w++ {
 		go trainNetWorker()
@@ -175,6 +175,7 @@ func trainWood(wood *wood, training *training) {
 			for father == mother {
 				mother = rand.Intn(netSize / 2)
 			}
+
 			wood.nets[(netSize/2)+j] = mergeNetsRandom(wood.nets[mother], wood.nets[father])
 		}
 		for j := 0; j < netSize; j++ {
@@ -183,6 +184,7 @@ func trainWood(wood *wood, training *training) {
 	}
 	woodTotalErr(wood, training)
 	fmt.Println("Done with training")
+	return wood.nets[0]
 }
 
 func main2() {
