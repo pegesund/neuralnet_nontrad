@@ -38,3 +38,9 @@ func activateSoftMax(val float64) float64 {
 func activateSoftMaxPrime(val float64) float64 {
 	return activateSoftMax(val) * (1 - activateSoftMax(val))
 }
+
+// loss functions
+
+func calcLossMeanSquared(out float64, expected float64) float64 {
+	return math.Pow(expected-out, 2)
+}

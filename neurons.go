@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/kr/pretty"
-	"math"
 	"math/rand"
 	"runtime"
 	"sync/atomic"
@@ -109,7 +108,7 @@ func calcError(net *net, expectedResult []float64) float64 {
 	netSize := len(net.layers)
 	var e float64 = 0
 	for i := 0; i < len(net.layers[netSize-1].neurons); i++ {
-		e += math.Pow(expectedResult[i]-net.layers[netSize-1].neurons[i].out, 2)
+		e += calcLossMeanSquared(net.layers[netSize-1].neurons[i].out, expectedResult[i])
 	}
 	net.error = e
 	return e
