@@ -93,7 +93,7 @@ func cloneNet(oldNet *net) *net {
 				newSynapses[k].weight = oldSynapses[k].weight
 				newSynapses[k].incSize = oldSynapses[k].incSize
 			}
-			newNeuron := neuron{newSynapses, oldNeurone.in, oldNeurone.out}
+			newNeuron := neuron{newSynapses, oldNeurone.in, oldNeurone.out, 0}
 			layer.neurons[j] = newNeuron
 		}
 	}

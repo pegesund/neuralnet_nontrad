@@ -19,8 +19,9 @@ type synapse struct {
 
 type neuron struct {
 	synapses []synapse
-	in		 float64
-	out		 float64
+	in       float64
+	out      float64
+	err      float64
 }
 
 type layer struct {
