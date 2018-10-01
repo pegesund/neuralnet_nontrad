@@ -14,8 +14,8 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int) {
 	updateErrorInLastLayer(net, tSet, tSetNumber)
 
 	// calc layer backwords from next layer
-	for i := 0; i < len(net.layers); i++ {
-		for j := len(net.layers[i].neurons) - 2; j >= 0; j-- {
+	for i := len(net.layers) - 2; i >= 0; i++ {
+		for j := 0; j < len(net.layers[i].neurons); j++ {
 			neurone := &net.layers[i].neurons[j]
 			synapses := &neurone.synapses
 			neurone.err = 0.0
