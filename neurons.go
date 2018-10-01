@@ -26,11 +26,11 @@ func randomVal() float64 {
 func seeInputOutput(net net) {
 	netSize := len(net.layers)
 	for i, n := range net.layers[0].neurons {
-		fmt.Print(i, " - ", n.val, " ,  ")
+		fmt.Print(i, " - ", n.out, " ,  ")
 	}
 	fmt.Println()
 	for i, n := range net.layers[netSize-1].neurons {
-		fmt.Print(i, " - ", n.val, " ,  ")
+		fmt.Print(i, " - ", n.out, " ,  ")
 	}
 }
 
@@ -42,7 +42,8 @@ func initRandom(layersLen []int, bias float64, layersActivate []func(float64) fl
 		layerLen := layersLen[i]
 		layer := layer{make([]neuron, layerLen)}
 		for j, _ := range layer.neurons {
-			layer.neurons[j].val = 0
+			layer.neurons[j].out = 0
+			layer.neurons[j].in = 0
 			if i < len(net.layers)-1 {
 				synapses := make([]synapse, layersLen[i+1])
 				for k, _ := range synapses {
@@ -66,7 +67,7 @@ func initRandom(layersLen []int, bias float64, layersActivate []func(float64) fl
 
 func predict(input []float64, net *net) {
 	setInput(net, input)
-	updateValues(net)
+	feedForward(net)
 	fmt.Println("----")
 	seeInputOutput(*net)
 	fmt.Println("====")
@@ -92,7 +93,7 @@ func cloneNet(oldNet *net) *net {
 				newSynapses[k].weight = oldSynapses[k].weight
 				newSynapses[k].incSize = oldSynapses[k].incSize
 			}
-			newNeuron := neuron{oldNeurone.val, newSynapses}
+			newNeuron := neuron{newSynapses, oldNeurone.in, oldNeurone.out}
 			layer.neurons[j] = newNeuron
 		}
 	}
@@ -108,7 +109,7 @@ func calcError(net *net, expectedResult []float64) float64 {
 	netSize := len(net.layers)
 	var e float64 = 0
 	for i := 0; i < len(net.layers[netSize-1].neurons); i++ {
-		e += math.Pow(expectedResult[i]-net.layers[netSize-1].neurons[i].val, 2)
+		e += math.Pow(expectedResult[i]-net.layers[netSize-1].neurons[i].out, 2)
 	}
 	net.error = e
 	return e
@@ -118,14 +119,15 @@ func calcError(net *net, expectedResult []float64) float64 {
 
 func setInput(net *net, input []float64) {
 	for i := 0; i < len(input); i++ {
-		net.layers[0].neurons[i].val = input[i]
+		net.layers[0].neurons[i].in = input[i]
+		net.layers[0].neurons[i].out = input[i]
 	}
 }
 
 // update values in higher layers based on weight
 // standard feed forward
 
-func updateValues(net *net) {
+func feedForward(net *net) {
 	netSize := len(net.layers)
 	for i := 1; i < netSize; i++ {
 		neurons := net.layers[i].neurons
@@ -139,19 +141,20 @@ func updateValues(net *net) {
 			// iterate layer below
 			for k := 0; k < len(net.layers[i-1].neurons); k++ {
 				neuronBelow := &net.layers[i-1].neurons[k]
-				sum += neuronBelow.synapses[j].weight * neuronBelow.val
+				sum += neuronBelow.synapses[j].weight * neuronBelow.out
 			}
+			net.layers[i].neurons[j].in = sum
 			// fmt.Println("I is: ", i,net.layersActivate[i] )
-			net.layers[i].neurons[j].val = net.layersActivate[i](sum)
+			net.layers[i].neurons[j].out = net.layersActivate[i](sum)
 		}
 
 		if net.layersActVal[i] == SoftMax {
 			softMaxSum := 0.0
 			for k := 0; k < len(net.layers[i].neurons); k++ {
-				softMaxSum += net.layers[i].neurons[k].val
+				softMaxSum += net.layers[i].neurons[k].out
 			}
 			for k := 0; k < len(net.layers[i].neurons); k++ {
-				net.layers[i].neurons[k].val = net.layers[i].neurons[k].val / softMaxSum
+				net.layers[i].neurons[k].out = net.layers[i].neurons[k].out / softMaxSum
 			}
 		}
 	}

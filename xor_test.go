@@ -18,17 +18,17 @@ func TestXor(t *testing.T) {
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 0, 0, 10000000, 0.00005}
+	training := training{&tSet, 0, 3, 7, 10000000, 0.00005, 0}
 	net := createCloneMutateAndEvaluate(wood.nets[0], &training)
 	assert.True(t, net.error < 0.01, "Error to high in tanh")
 	predict([]float64{0, 0}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.1)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out < 0.1)
 	predict([]float64{1, 0}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.9)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out > 0.9)
 	predict([]float64{0, 1}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.9)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out > 0.9)
 	predict([]float64{1, 1}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.1)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out < 0.1)
 	fmt.Println(wood)
 }
 
@@ -46,21 +46,21 @@ func TestXorSoftMax(t *testing.T) {
 	//in := [][]float64{{0, 0}, {1, 1}}
 	// out := [][]float64{{1, 0}, {1, 0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 0, 0, 1000000, 0.000002}
+	training := training{&tSet, 0, 0, 0, 1000000, 0.000002, 0}
 	net := createCloneMutateAndEvaluate(wood.nets[0], &training)
 	assert.True(t, net.error < 0.3, "Error to high in softmax")
 	predict([]float64{0, 0}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.99)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].val < 0.01)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out > 0.99)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].out < 0.01)
 	predict([]float64{1, 0}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].val > 0.99)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.01)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].out > 0.99)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out < 0.01)
 	predict([]float64{0, 1}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].val > 0.99)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val < 0.01)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].out > 0.99)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out < 0.01)
 	predict([]float64{1, 1}, net)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].val > 0.99)
-	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].val < 0.01)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out > 0.99)
+	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].out < 0.01)
 	fmt.Println(wood)
 	// assert.True(t, 2 == 4, "Tesing very important fact")
 }

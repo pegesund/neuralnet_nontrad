@@ -9,7 +9,8 @@ func mergeNetsRandom(mother *net, father *net) *net {
 		for j := 0; j < len(mother.layers[i].neurons); j++ {
 			inheritFather := rand.Intn(2) == 1
 			if inheritFather {
-				child.layers[i].neurons[j].val = father.layers[i].neurons[j].val
+				child.layers[i].neurons[j].out = father.layers[i].neurons[j].out
+				child.layers[i].neurons[j].in = father.layers[i].neurons[j].in
 				child.bias = father.bias
 			}
 			for k := 0; k < len(mother.layers[i].neurons[j].synapses); k++ {

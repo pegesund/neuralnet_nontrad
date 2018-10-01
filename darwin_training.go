@@ -39,7 +39,7 @@ func averageErrorInNet(set *trainingSet, net *net, oldBest float64) float64 {
 	sumErr := 0.0
 	for i := 0; i < len(set.in); i++ {
 		setInput(net, set.in[i])
-		updateValues(net)
+		feedForward(net)
 		sumErr += calcError(net, set.out[i]) / float64(len(set.in))
 		if sumErr > oldBest {
 			break
@@ -54,7 +54,7 @@ func averageErrorInNet(set *trainingSet, net *net, oldBest float64) float64 {
 // returns the winning net
 func createCloneMutateAndEvaluate(net *net, training *training) *net {
 	winner := &net
-	updateValues(net)
+	feedForward(net)
 	netAvgErr := averageErrorInNet(training.tSet, net, 1000)
 	for i := 0; i < training.cloneIterations && training.errPass < netAvgErr; i++ {
 		if i%1000 == 0 {
@@ -62,7 +62,7 @@ func createCloneMutateAndEvaluate(net *net, training *training) *net {
 		}
 		clone := cloneNet(net)
 		permuteNet(clone)
-		updateValues(clone)
+		feedForward(clone)
 		cloneAvgErr := averageErrorInNet(training.tSet, clone, netAvgErr)
 		if cloneAvgErr < netAvgErr {
 			winner = &clone
@@ -145,7 +145,7 @@ func createWood(diversity int, layers []int, bias float64, layersActivateVals []
 func woodTotalErr(wood *wood, training *training) (total float64) {
 	total = 0.0
 	for i := 0; i < len(wood.nets); i++ {
-		updateValues(wood.nets[i])
+		feedForward(wood.nets[i])
 		e := averageErrorInNet(training.tSet, wood.nets[i], math.MaxFloat64)
 		total += e
 		fmt.Printf(" %.13f ( %d - %d )  ", e, wood.nets[i].generation, wood.nets[i].netType)

@@ -18,8 +18,9 @@ type synapse struct {
 }
 
 type neuron struct {
-	val      float64
 	synapses []synapse
+	in		 float64
+	out		 float64
 }
 
 type layer struct {
