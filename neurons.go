@@ -33,13 +33,52 @@ func seeInputOutput(net net) {
 	}
 }
 
+func getLayersActivate(net *net) []func(float64) float64 {
+	res := make([]func(float64) float64, len(net.layers))
+	for i := 0; i < len(net.layers); i++ {
+		res[i] = net.layers[i].activateFunc
+	}
+	return res
+}
+
+func getLayersActivateVal(net *net) []ActivationFunction {
+	res := make([]ActivationFunction, len(net.layers))
+	for i := 0; i < len(net.layers); i++ {
+		res[i] = net.layers[i].activateVal
+	}
+	return res
+}
+
+func getLayersActivatePrime(net *net) []func(float64) float64 {
+	res := make([]func(float64) float64, len(net.layers))
+	for i := 0; i < len(net.layers); i++ {
+		res[i] = net.layers[i].activatePrime
+	}
+	return res
+}
+
+func getPrimeFunction(a ActivationFunction) func(float64) float64 {
+	switch a {
+	case Identity:
+		return activateIdentity
+	case Tanh:
+		return activateTanhPrime
+	case Sigmoid:
+		return activateSigmoidPrime
+	case SoftMax:
+		return activateSoftMaxPrime
+	}
+	return nil
+}
+
 // creates and initiates net with random values
 func initRandom(layersLen []int, bias float64, layersActivate []func(float64) float64, layersActivateVals []ActivationFunction) *net {
 	var net = net{make([]layer, len(layersLen)), bias, 1,
-		layersLen, layersActivate, layersActivateVals, 0, 0, ClonedNet}
+		layersLen, 0, 0, ClonedNet}
 	for i := 0; i < len(layersLen); i++ {
 		layerLen := layersLen[i]
-		layer := layer{make([]neuron, layerLen)}
+		layer := layer{make([]neuron, layerLen), layersActivate[i], layersActivateVals[i],
+			getPrimeFunction(layersActivateVals[i])}
 		for j, _ := range layer.neurons {
 			layer.neurons[j].out = 0
 			layer.neurons[j].in = 0
@@ -77,11 +116,13 @@ func predict(input []float64, net *net) {
 
 func cloneNet(oldNet *net) *net {
 	atomic.AddUint64(&cloneCounter, 1)
-	treeSize := len(oldNet.layers)
-	var newNet = net{make([]layer, treeSize), oldNet.bias, oldNet.mutationInc, oldNet.layersLength,
-		oldNet.layersActivate, oldNet.layersActVal, 0, 0, oldNet.netType}
-	for i := 0; i < treeSize; i++ {
-		layer := layer{make([]neuron, len(oldNet.layers[i].neurons))}
+	layerSize := len(oldNet.layers)
+	var newNet = net{make([]layer, layerSize), oldNet.bias, oldNet.mutationInc, oldNet.layersLength,
+		0, 0, oldNet.netType}
+	for i := 0; i < layerSize; i++ {
+		layer := layer{make([]neuron, len(oldNet.layers[i].neurons)),
+			oldNet.layers[i].activateFunc, oldNet.layers[i].activateVal,
+			oldNet.layers[i].activatePrime}
 		newNet.layers[i] = layer
 		for j := 0; j < len(layer.neurons); j++ {
 			oldNeurone := &oldNet.layers[i].neurons[j]
@@ -108,7 +149,7 @@ func calcError(net *net, expectedResult []float64) float64 {
 	netSize := len(net.layers)
 	var e float64 = 0
 	for i := 0; i < len(net.layers[netSize-1].neurons); i++ {
-		e += calcLossMeanSquared(net.layers[netSize-1].neurons[i].out, expectedResult[i])
+		e += calcLossSquared(net.layers[netSize-1].neurons[i].out, expectedResult[i])
 	}
 	net.error = e
 	return e
@@ -143,11 +184,11 @@ func feedForward(net *net) {
 				sum += neuronBelow.synapses[j].weight * neuronBelow.out
 			}
 			net.layers[i].neurons[j].in = sum
-			// fmt.Println("I is: ", i,net.layersActivate[i] )
-			net.layers[i].neurons[j].out = net.layersActivate[i](sum)
+			// fmt.Println("I is: ", i,net.activateFunc[i] )
+			net.layers[i].neurons[j].out = net.layers[i].activateFunc(sum)
 		}
 
-		if net.layersActVal[i] == SoftMax {
+		if net.layers[i].activateVal == SoftMax {
 			softMaxSum := 0.0
 			for k := 0; k < len(net.layers[i].neurons); k++ {
 				softMaxSum += net.layers[i].neurons[k].out

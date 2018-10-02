@@ -41,6 +41,6 @@ func activateSoftMaxPrime(val float64) float64 {
 
 // loss functions
 
-func calcLossMeanSquared(out float64, expected float64) float64 {
+func calcLossSquared(out float64, expected float64) float64 {
 	return math.Pow(expected-out, 2)
 }

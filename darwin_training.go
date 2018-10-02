@@ -79,9 +79,12 @@ func createCloneMutateAndEvaluate(net *net, training *training) *net {
 // permute the net
 // changes only the weights and directions
 func permuteNet(net *net) {
-	treeSize := len(net.layers)
-	for i := 0; i < treeSize; i++ {
-		layer := &layer{make([]neuron, len(net.layers[i].neurons))}
+	layerSize := len(net.layers)
+	for i := 0; i < layerSize; i++ {
+		layer := &layer{make([]neuron, len(net.layers[i].neurons)),
+			net.layers[i].activateFunc,
+			net.layers[i].activateVal,
+			net.layers[i].activatePrime}
 		for j := 0; j < len(layer.neurons); j++ {
 			neurone := &net.layers[i].neurons[j]
 			synapses := &neurone.synapses
@@ -184,7 +187,7 @@ func trainWood(wood *wood, training *training) (bestNet *net) {
 				for l := 0; l < len(layersLen); l++ {
 					layersLen[l] = len(layers[l].neurons)
 				}
-				wood.nets[n] = initRandom(layersLen, wood.nets[n].bias, wood.nets[n].layersActivate, wood.nets[n].layersActVal)
+				wood.nets[n] = initRandom(layersLen, wood.nets[n].bias, getLayersActivate(wood.nets[n]), getLayersActivateVal(wood.nets[n]))
 				wood.nets[n].netType = NewRandNet
 			}
 		}

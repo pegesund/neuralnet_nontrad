@@ -6,7 +6,7 @@ package main
 func updateErrorInLastLayer(net *net, tSet *trainingSet, tSetNumber int) {
 	lastLayer := &net.layers[len(net.layers)-1]
 	for i := 0; i < len(tSet.out); i++ {
-		lastLayer.neurons[i].err = calcLossMeanSquared(lastLayer.neurons[i].out, tSet.out[tSetNumber][i])
+		lastLayer.neurons[i].err = calcLossSquared(lastLayer.neurons[i].out, tSet.out[tSetNumber][i])
 	}
 }
 

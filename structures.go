@@ -25,19 +25,20 @@ type neuron struct {
 }
 
 type layer struct {
-	neurons []neuron
+	neurons       []neuron
+	activateFunc  func(float64) float64
+	activateVal   ActivationFunction
+	activatePrime func(float64) float64
 }
 
 type net struct {
-	layers         []layer
-	bias           float64
-	mutationInc    float64
-	layersLength   []int
-	layersActivate []func(float64) float64
-	layersActVal   []ActivationFunction
-	error          float64
-	generation     int
-	netType        int
+	layers       []layer
+	bias         float64
+	mutationInc  float64
+	layersLength []int
+	error        float64
+	generation   int
+	netType      int
 }
 
 type wood struct {
