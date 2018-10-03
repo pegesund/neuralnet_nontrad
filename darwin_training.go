@@ -22,7 +22,7 @@ var mutateJobs = make(chan *trainMsg)
 var mutateResults = make(chan *trainMsg)
 var wg sync.WaitGroup
 
-// pick training from jobs and pass on to train function
+// pick darwinTraining from jobs and pass on to train function
 func trainNetWorker() {
 	for {
 		select {
@@ -38,7 +38,7 @@ func trainNetWorker() {
 func averageErrorInNet(set *trainingSet, net *net, oldBest float64) float64 {
 	sumErr := 0.0
 	for i := 0; i < len(set.in); i++ {
-		setInput(net, set.in[i])
+		setInputFirstLayer(net, set.in[i])
 		feedForward(net)
 		sumErr += calcError(net, set.out[i]) / float64(len(set.in))
 		if sumErr > oldBest {
@@ -52,7 +52,7 @@ func averageErrorInNet(set *trainingSet, net *net, oldBest float64) float64 {
 // creates clones of a net and keeps the winner
 // scores agains the hole traning net
 // returns the winning net
-func createCloneMutateAndEvaluate(net *net, training *training) *net {
+func createCloneMutateAndEvaluate(net *net, training *darwinTraining) *net {
 	winner := &net
 	feedForward(net)
 	netAvgErr := averageErrorInNet(training.tSet, net, 1000)
@@ -110,7 +110,7 @@ func sortNetsByErr(nets []*net) {
 	})
 }
 
-func trainOneGeneration(training *training, wood *wood) {
+func trainOneGeneration(training *darwinTraining, wood *wood) {
 	wg.Add(len(wood.nets))
 	for i := 0; i < len(wood.nets); i++ {
 		mutateJobs <- &trainMsg{training, wood, i}
@@ -125,27 +125,14 @@ func createWood(diversity int, layers []int, bias float64, layersActivateVals []
 	if diversity%2 != 0 {
 		diversity++
 	}
-	layersActivate := make([]func(float64) float64, len(layers))
-	for i := 0; i < len(layers); i++ {
-		switch layersActivateVals[i] {
-		case Identity:
-			layersActivate[i] = activateIdentity
-		case Tanh:
-			layersActivate[i] = activateTanh
-		case Sigmoid:
-			layersActivate[i] = activateSigmoid
-		case SoftMax:
-			layersActivate[i] = activateSoftMax
-		}
-	}
 	nets := make([]*net, diversity)
 	for i := 0; i < len(nets); i++ {
-		nets[i] = initRandom(layers[:], bias, layersActivate, layersActivateVals)
+		nets[i] = initRandom(layers[:], bias, layersActivateVals)
 	}
 	return &wood{nets, diversity}
 }
 
-func woodTotalErr(wood *wood, training *training) (total float64) {
+func woodTotalErr(wood *wood, training *darwinTraining) (total float64) {
 	total = 0.0
 	for i := 0; i < len(wood.nets); i++ {
 		feedForward(wood.nets[i])
@@ -157,8 +144,8 @@ func woodTotalErr(wood *wood, training *training) (total float64) {
 	return
 }
 
-func trainWood(wood *wood, training *training) (bestNet *net) {
-	// spawn number of threads to do training in
+func trainWood(wood *wood, training *darwinTraining) (bestNet *net) {
+	// spawn number of threads to do darwinTraining in
 	for w := 0; w < training.threads; w++ {
 		go trainNetWorker()
 	}
@@ -187,7 +174,7 @@ func trainWood(wood *wood, training *training) (bestNet *net) {
 				for l := 0; l < len(layersLen); l++ {
 					layersLen[l] = len(layers[l].neurons)
 				}
-				wood.nets[n] = initRandom(layersLen, wood.nets[n].bias, getLayersActivate(wood.nets[n]), getLayersActivateVal(wood.nets[n]))
+				wood.nets[n] = initRandom(layersLen, wood.nets[n].bias, getLayersActivateVal(wood.nets[n]))
 				wood.nets[n].netType = NewRandNet
 			}
 		}
@@ -196,7 +183,7 @@ func trainWood(wood *wood, training *training) (bestNet *net) {
 		}
 	}
 	woodTotalErr(wood, training)
-	fmt.Println("Done with training")
+	fmt.Println("Done with darwinTraining")
 	return wood.nets[0]
 }
 

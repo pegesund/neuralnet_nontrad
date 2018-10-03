@@ -29,16 +29,8 @@ func seeInputOutput(net net) {
 	}
 	fmt.Println()
 	for i, n := range net.layers[netSize-1].neurons {
-		fmt.Print(i, " - ", n.out, " ,  ")
+		fmt.Println(i, " - ", n.out, " ,  ")
 	}
-}
-
-func getLayersActivate(net *net) []func(float64) float64 {
-	res := make([]func(float64) float64, len(net.layers))
-	for i := 0; i < len(net.layers); i++ {
-		res[i] = net.layers[i].activateFunc
-	}
-	return res
 }
 
 func getLayersActivateVal(net *net) []ActivationFunction {
@@ -49,36 +41,29 @@ func getLayersActivateVal(net *net) []ActivationFunction {
 	return res
 }
 
-func getLayersActivatePrime(net *net) []func(float64) float64 {
-	res := make([]func(float64) float64, len(net.layers))
-	for i := 0; i < len(net.layers); i++ {
-		res[i] = net.layers[i].activatePrime
-	}
-	return res
-}
-
-func getPrimeFunction(a ActivationFunction) func(float64) float64 {
+func getActivationFunction(a ActivationFunction) (func(float64) float64, func(float64) float64) {
 	switch a {
 	case Identity:
-		return activateIdentity
+		return activateIdentity, activateIdentity
 	case Tanh:
-		return activateTanhPrime
+		return activateTanh, activateTanhPrime
 	case Sigmoid:
-		return activateSigmoidPrime
+		return activateSigmoid, activateSigmoidPrime
 	case SoftMax:
-		return activateSoftMaxPrime
+		return activateSoftMax, activateSoftMaxPrime
 	}
-	return nil
+	return nil, nil
 }
 
 // creates and initiates net with random values
-func initRandom(layersLen []int, bias float64, layersActivate []func(float64) float64, layersActivateVals []ActivationFunction) *net {
+// used as a starting point for darwin-nets and backprop-nets
+func initRandom(layersLen []int, bias float64, layersActivateVals []ActivationFunction) *net {
 	var net = net{make([]layer, len(layersLen)), bias, 1,
 		layersLen, 0, 0, ClonedNet}
 	for i := 0; i < len(layersLen); i++ {
 		layerLen := layersLen[i]
-		layer := layer{make([]neuron, layerLen), layersActivate[i], layersActivateVals[i],
-			getPrimeFunction(layersActivateVals[i])}
+		activate, activatePrime := getActivationFunction(layersActivateVals[i])
+		layer := layer{make([]neuron, layerLen), activate, layersActivateVals[i], activatePrime}
 		for j, _ := range layer.neurons {
 			layer.neurons[j].out = 0
 			layer.neurons[j].in = 0
@@ -104,7 +89,7 @@ func initRandom(layersLen []int, bias float64, layersActivate []func(float64) fl
 }
 
 func predict(input []float64, net *net) {
-	setInput(net, input)
+	setInputFirstLayer(net, input)
 	feedForward(net)
 	fmt.Println("----")
 	seeInputOutput(*net)
@@ -157,7 +142,7 @@ func calcError(net *net, expectedResult []float64) float64 {
 
 // set values in input neurons
 
-func setInput(net *net, input []float64) {
+func setInputFirstLayer(net *net, input []float64) {
 	for i := 0; i < len(input); i++ {
 		net.layers[0].neurons[i].in = input[i]
 		net.layers[0].neurons[i].out = input[i]
@@ -214,26 +199,35 @@ func benchmarkClone(net *net) {
 	fmt.Println(runtime.NumCPU())
 }
 
-func main3() {
+func testDarwinWoodTraining() {
 	layersLength := []int{2, 3, 3, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
 	wood := createWood(50, layersLength, 0.0, layersActivate)
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 10, 7, 300, 0.0, 200}
+	training := darwinTraining{&tSet, 0, 10, 7, 300, 0.0, 200}
 	trainWood(wood, &training)
+	fmt.Println("Winners: ", winners)
+	fmt.Println("CloneCounter: ", cloneCounter)
+}
+
+func testBackPropTraining() {
+	layersLength := []int{2, 3, 3, 3, 3, 1}
+	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
+	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
+	out := [][]float64{{0}, {1}, {1}, {0}}
+	tSet := trainingSet{in, out}
+	net := initRandom(layersLength, 0.2, layersActivate)
+	trainBackPropagate(net, &tSet, 0.0001, 100000)
 }
 
 func main() {
 	fmt.Println("Ok, starting")
 	start := time.Now()
 	rand.Seed(time.Now().UTC().UnixNano())
-	main3()
-	// go func() { commands <- "hupp" }()
-	// fmt.Println(<-commands)
+	// testDarwinWoodTraining()
+	testBackPropTraining()
 	elapsed := time.Since(start)
-	fmt.Println("Winners: ", winners)
-	fmt.Println("CloneCounter: ", cloneCounter)
 	fmt.Printf("\n Time took %s", elapsed)
 }

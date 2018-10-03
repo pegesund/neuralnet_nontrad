@@ -51,7 +51,7 @@ type trainingSet struct {
 	out [][]float64
 }
 
-type training struct {
+type darwinTraining struct {
 	tSet            *trainingSet
 	batchSize       int
 	threads         int
@@ -62,7 +62,7 @@ type training struct {
 }
 
 type trainMsg struct {
-	training  *training
+	training  *darwinTraining
 	wood      *wood
 	netNumber int
 }

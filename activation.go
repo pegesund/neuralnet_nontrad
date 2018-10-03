@@ -44,3 +44,9 @@ func activateSoftMaxPrime(val float64) float64 {
 func calcLossSquared(out float64, expected float64) float64 {
 	return math.Pow(expected-out, 2)
 }
+
+/*
+func calcCostSquared(net *net, tSet *trainingSet) {
+	for i := 0; i < tSet.out
+}
+*/

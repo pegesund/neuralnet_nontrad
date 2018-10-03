@@ -18,7 +18,7 @@ func TestXor(t *testing.T) {
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 3, 7, 10000000, 0.00005, 0}
+	training := darwinTraining{&tSet, 0, 3, 7, 10000000, 0.00005, 0}
 	net := createCloneMutateAndEvaluate(wood.nets[0], &training)
 	assert.True(t, net.error < 0.01, "Error to high in tanh")
 	predict([]float64{0, 0}, net)
@@ -34,7 +34,7 @@ func TestXor(t *testing.T) {
 
 /*
 	Test same input/output as last test but use softmax as the last layer
-	Restructure output and training data to two neurons
+	Restructure output and darwinTraining data to two neurons
 	Zero is represented as {1,0} and one as {0,1}
 */
 func TestXorSoftMax(t *testing.T) {
@@ -46,7 +46,7 @@ func TestXorSoftMax(t *testing.T) {
 	//in := [][]float64{{0, 0}, {1, 1}}
 	// out := [][]float64{{1, 0}, {1, 0}}
 	tSet := trainingSet{in, out}
-	training := training{&tSet, 0, 0, 0, 1000000, 0.000002, 0}
+	training := darwinTraining{&tSet, 0, 0, 0, 1000000, 0.000002, 0}
 	net := createCloneMutateAndEvaluate(wood.nets[0], &training)
 	assert.True(t, net.error < 0.3, "Error to high in softmax")
 	predict([]float64{0, 0}, net)
