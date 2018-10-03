@@ -213,13 +213,14 @@ func testDarwinWoodTraining() {
 }
 
 func testBackPropTraining() {
-	layersLength := []int{2, 3, 3, 3, 3, 1}
-	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
+	layersLength := []int{2, 3, 1}
+	layersActivate := []ActivationFunction{Identity, Tanh, Tanh}
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, 0.2, layersActivate)
-	trainBackPropagate(net, &tSet, 0.0001, 100000)
+	trainBackPropagate(net, &tSet, 0.0001, 1000000, true)
+	seeNet(*net)
 }
 
 func main() {

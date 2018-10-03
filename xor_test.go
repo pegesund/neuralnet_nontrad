@@ -62,5 +62,29 @@ func TestXorSoftMax(t *testing.T) {
 	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out > 0.99)
 	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].out < 0.01)
 	fmt.Println(wood)
-	// assert.True(t, 2 == 4, "Tesing very important fact")
+}
+
+func TestBackPropTrainingXor1(t *testing.T) {
+	layersLength := []int{2, 3, 3, 3, 3, 1}
+	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
+	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
+	out := [][]float64{{0}, {1}, {1}, {0}}
+	tSet := trainingSet{in, out}
+	net := initRandom(layersLength, 0.2, layersActivate)
+	trainBackPropagate(net, &tSet, 0.0001, 400000, true)
+	cost := calcCostSquared(net)
+	fmt.Println("Cost: ", cost)
+	assert.True(t, cost < 0.0001)
+}
+
+func TestBackPropTrainingXor2(t *testing.T) {
+	layersLength := []int{2, 3, 3, 3, 3, 1}
+	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Sigmoid}
+	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
+	out := [][]float64{{0}, {1}, {1}, {0}}
+	tSet := trainingSet{in, out}
+	net := initRandom(layersLength, 0.2, layersActivate)
+	trainBackPropagate(net, &tSet, 0.0001, 1000, false)
+	cost := calcCostSquared(net)
+	assert.True(t, cost < 0.001)
 }

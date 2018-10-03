@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type ActivationFunction int
 
@@ -39,14 +42,16 @@ func activateSoftMaxPrime(val float64) float64 {
 	return activateSoftMax(val) * (1 - activateSoftMax(val))
 }
 
-// loss functions
-
 func calcLossSquared(out float64, expected float64) float64 {
 	return math.Pow(expected-out, 2)
 }
 
-/*
-func calcCostSquared(net *net, tSet *trainingSet) {
-	for i := 0; i < tSet.out
+func calcCostSquared(net *net) float64 {
+	sum := 0.0
+	lastLayer := &net.layers[len(net.layers)-1]
+	for i := 0; i < len(lastLayer.neurons); i++ {
+		fmt.Println("Out: ", lastLayer.neurons[i].out, " - err: ", lastLayer.neurons[i].out)
+		sum += lastLayer.neurons[i].err
+	}
+	return sum
 }
-*/
