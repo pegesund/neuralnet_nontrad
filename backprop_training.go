@@ -19,7 +19,6 @@ func setErrorInLastLayer(net *net, tSet *trainingSet, tSetNumber int) {
 	lastLayer := &net.layers[len(net.layers)-1]
 	for i := 0; i < len(tSet.out[tSetNumber]); i++ {
 		loss := tSet.out[tSetNumber][i] - lastLayer.neurons[i].out
-		// fmt.Println("Loss: ", loss, " - training: ", tSet.out[tSetNumber][i])
 		lastLayer.neurons[i].err = loss
 	}
 }
@@ -57,11 +56,11 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64) {
 func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations int, printInfo bool) {
 	tSetNumber := 0
 	for i := 1; i <= iterations; i++ {
-		if printInfo && i%1000 == 0 {
-			fmt.Printf("Iteration: %d cost %.13f \n", i, calcCostSquared(net))
+		if printInfo && i%10000 == 0 {
+			fmt.Printf("Iteration: %d cost %.13f \n", i, calcCostSquared(net, tSet, -1))
 		}
 		backPropagate(net, tSet, tSetNumber, alpha)
 		tSetNumber = (tSetNumber + 1) % len(tSet.in)
 	}
-	fmt.Printf("End cost %.13f \n", calcCostSquared(net))
+	fmt.Printf("End cost %.13f \n", calcCostSquared(net, tSet, -1))
 }

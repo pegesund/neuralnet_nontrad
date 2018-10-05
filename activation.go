@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -42,16 +41,27 @@ func activateSoftMaxPrime(val float64) float64 {
 	return val * (1 - val)
 }
 
-func calcLossSquared(out float64, expected float64) float64 {
+func calcLossSquared(expected float64, out float64) float64 {
 	return math.Pow(expected-out, 2)
 }
 
-func calcCostSquared(net *net) float64 {
-	sum := 0.0
+/*
+	Calc loss squared against a training set, start from beginning
+    maxCheck iterations, -1 for all
+*/
+func calcCostSquared(net *net, tSet *trainingSet, maxCheck int) float64 {
+	counter, sum := 0, 0.0
 	lastLayer := &net.layers[len(net.layers)-1]
-	for i := 0; i < len(lastLayer.neurons); i++ {
-		fmt.Println("Out: ", lastLayer.neurons[i].out, " - err: ", lastLayer.neurons[i].out)
-		sum += lastLayer.neurons[i].err
+	for i := 0; i < len(tSet.out); i++ {
+		for j := 0; j < len(lastLayer.neurons); j++ {
+			setInputFirstLayer(net, tSet.out[i])
+			feedForward(net)
+			counter++
+			if counter == maxCheck {
+				break
+			}
+			sum += calcLossSquared(tSet.out[i][j], lastLayer.neurons[j].out)
+		}
 	}
-	return sum
+	return sum / float64(counter)
 }
