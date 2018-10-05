@@ -18,7 +18,11 @@ func seeNet(net net) {
 */
 
 func randomVal() float64 {
-	return rand.Float64()
+	return random(1, -1)
+}
+
+func random(a, b float64) float64 {
+	return (b-a)*rand.Float64() + a
 }
 
 // Function to see values in first and last layer
@@ -203,8 +207,8 @@ func testDarwinWoodTraining() {
 	layersLength := []int{2, 3, 3, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
 	wood := createWood(50, layersLength, 0.0, layersActivate)
-	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
-	out := [][]float64{{0}, {1}, {1}, {0}}
+	in := [][]float64{{0, 1}, {0, 1}, {1, 0}, {1, 0}}
+	out := [][]float64{{0}, {0}, {1}, {1}}
 	tSet := trainingSet{in, out}
 	training := darwinTraining{&tSet, 0, 10, 7, 300, 0.0, 200}
 	trainWood(wood, &training)
@@ -213,20 +217,21 @@ func testDarwinWoodTraining() {
 }
 
 func testBackPropTraining() {
-	layersLength := []int{2, 3, 1}
-	layersActivate := []ActivationFunction{Identity, Tanh, Tanh}
+	layersLength := []int{2, 4, 4, 4, 1}
+	layersActivate := []ActivationFunction{Identity, Sigmoid, Sigmoid, Sigmoid, Sigmoid}
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, 0.2, layersActivate)
-	trainBackPropagate(net, &tSet, 0.0001, 1000000, true)
+	trainBackPropagate(net, &tSet, 0.6, 10000016, true)
 	seeNet(*net)
 }
 
 func main() {
 	fmt.Println("Ok, starting")
 	start := time.Now()
-	rand.Seed(time.Now().UTC().UnixNano())
+	// rand.Seed(time.Now().UTC().UnixNano())
+	rand.Seed(0)
 	// testDarwinWoodTraining()
 	testBackPropTraining()
 	elapsed := time.Since(start)

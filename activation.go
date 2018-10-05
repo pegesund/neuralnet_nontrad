@@ -23,7 +23,7 @@ func activateSigmoid(val float64) float64 {
 }
 
 func activateSigmoidPrime(val float64) float64 {
-	return activateSigmoid(val) * (1 - activateSigmoid(val))
+	return val * (1 - val)
 }
 
 func activateTanh(val float64) float64 {
@@ -31,7 +31,7 @@ func activateTanh(val float64) float64 {
 }
 
 func activateTanhPrime(val float64) float64 {
-	return 1 - math.Exp(math.Tanh(val))
+	return 1 - math.Pow(val, 2)
 }
 
 func activateSoftMax(val float64) float64 {
@@ -39,7 +39,7 @@ func activateSoftMax(val float64) float64 {
 }
 
 func activateSoftMaxPrime(val float64) float64 {
-	return activateSoftMax(val) * (1 - activateSoftMax(val))
+	return val * (1 - val)
 }
 
 func calcLossSquared(out float64, expected float64) float64 {
