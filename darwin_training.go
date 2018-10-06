@@ -121,7 +121,7 @@ func trainOneGeneration(training *darwinTraining, wood *wood) {
 	wg.Wait()
 }
 
-func createWood(diversity int, layers []int, bias float64, layersActivateVals []ActivationFunction) *wood {
+func createWood(diversity int, layers []int, bias bool, layersActivateVals []ActivationFunction) *wood {
 	if diversity%2 != 0 {
 		diversity++
 	}

@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 
-
 func setErrorInLastLayer(net *net, tSet *trainingSet, tSetNumber int) {
 	lastLayer := &net.layers[len(net.layers)-1]
 	for i := 0; i < len(tSet.out[tSetNumber]); i++ {
@@ -11,7 +10,7 @@ func setErrorInLastLayer(net *net, tSet *trainingSet, tSetNumber int) {
 	}
 }
 
-func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64) {
+func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64, momentum float64) {
 	setInputFirstLayer(net, tSet.in[tSetNumber])
 	feedForward(net)
 	lastLayer := &net.layers[len(net.layers)-1]
@@ -34,20 +33,21 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64) {
 				sumErr += hiddenDelta
 				// update current synapse with wight from above
 				change := toNeurone.err * neurone.out
-				synapse.weight += change * alpha
+				synapse.weight += (change * alpha) + (synapse.incSize * momentum)
+				synapse.incSize = change
 			}
 			neurone.err = net.layers[i].activatePrime(neurone.out) * sumErr
 		}
 	}
 }
 
-func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations int, printInfo bool) {
+func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations int, momemtum float64, printInfo bool) {
 	tSetNumber := 0
 	for i := 1; i <= iterations; i++ {
 		if printInfo && i%10000 == 0 {
 			fmt.Printf("Iteration: %d cost %.13f \n", i, calcCostSquared(net, tSet, -1))
 		}
-		backPropagate(net, tSet, tSetNumber, alpha)
+		backPropagate(net, tSet, tSetNumber, alpha, momemtum)
 		tSetNumber = (tSetNumber + 1) % len(tSet.in)
 	}
 	// fmt.Printf("End cost %.13f \n", calcCostSquared(net, tSet, -1))

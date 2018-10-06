@@ -71,7 +71,7 @@ func TestBackPropTrainingXor1(t *testing.T) {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, 0.2, layersActivate)
-	trainBackPropagate(net, &tSet, 0.0001, 400000, true)
+	trainBackPropagate(net, &tSet, 0.0001, 100000, true)
 	cost := calcCostSquared(net)
 	fmt.Println("Cost: ", cost)
 	assert.True(t, cost < 0.0001)
@@ -84,7 +84,7 @@ func TestBackPropTrainingXor2(t *testing.T) {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, 0.2, layersActivate)
-	trainBackPropagate(net, &tSet, 0.0001, 1000, false)
+	trainBackPropagate(net, &tSet, 0.0001, 100000, false)
 	cost := calcCostSquared(net)
 	assert.True(t, cost < 0.001)
 }

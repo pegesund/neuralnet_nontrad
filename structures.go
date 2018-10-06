@@ -33,7 +33,7 @@ type layer struct {
 
 type net struct {
 	layers       []layer
-	bias         float64
+	bias         bool
 	mutationInc  float64
 	layersLength []int
 	error        float64
