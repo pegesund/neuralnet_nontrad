@@ -61,16 +61,22 @@ func getActivationFunction(a ActivationFunction) (func(float64) float64, func(fl
 
 // creates and initiates net with random values
 // used as a starting point for darwin-nets and backprop-nets
-func initRandom(layersLen []int, bias float64, layersActivateVals []ActivationFunction) *net {
+// the direction training prop is not used in gradient descent, only by the darwing nets
+func initRandom(layersLen []int, bias bool, layersActivateVals []ActivationFunction) *net {
 	var net = net{make([]layer, len(layersLen)), bias, 1,
 		layersLen, 0, 0, ClonedNet}
 	for i := 0; i < len(layersLen); i++ {
-		layerLen := layersLen[i]
+		neuroneLen := layersLen[i]
 		activate, activatePrime := getActivationFunction(layersActivateVals[i])
-		layer := layer{make([]neuron, layerLen), activate, layersActivateVals[i], activatePrime}
+		var biasUnitAdd int
+		if !bias || i == len(layersLen)-1 || i == 0 {
+			biasUnitAdd = 0
+		} else {
+			biasUnitAdd = 1
+		} // do not add bias in first or last layer
+		layer := layer{make([]neuron, neuroneLen+biasUnitAdd),
+			activate, layersActivateVals[i], activatePrime}
 		for j, _ := range layer.neurons {
-			layer.neurons[j].out = 0
-			layer.neurons[j].in = 0
 			if i < len(net.layers)-1 {
 				synapses := make([]synapse, layersLen[i+1])
 				for k, _ := range synapses {
@@ -162,15 +168,12 @@ func feedForward(net *net) {
 		neurons := net.layers[i].neurons
 		for j := 0; j < len(neurons); j++ {
 			var sum float64
-			if i == 1 {
-				sum = net.bias
-			} else {
-				sum = 0
-			}
 			// iterate layer below
 			for k := 0; k < len(net.layers[i-1].neurons); k++ {
 				neuronBelow := &net.layers[i-1].neurons[k]
-				sum += neuronBelow.synapses[j].weight * neuronBelow.out
+				if j < len(neuronBelow.synapses) {
+					sum += neuronBelow.synapses[j].weight * neuronBelow.out
+				}
 			}
 			net.layers[i].neurons[j].in = sum
 			// fmt.Println("I is: ", i,net.activateFunc[i] )
@@ -194,7 +197,7 @@ func benchmarkClone(net *net) {
 	start := time.Now()
 	for i := 0; i < 10000000; i++ {
 		t2 := cloneNet(net)
-		if t2.bias == 3 {
+		if t2.bias == false {
 			fmt.Println("OJ")
 		}
 	}
@@ -206,7 +209,7 @@ func benchmarkClone(net *net) {
 func testDarwinWoodTraining() {
 	layersLength := []int{2, 3, 3, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
-	wood := createWood(50, layersLength, 0.0, layersActivate)
+	wood := createWood(50, layersLength, false, layersActivate)
 	in := [][]float64{{0, 1}, {0, 1}, {1, 0}, {1, 0}}
 	out := [][]float64{{0}, {0}, {1}, {1}}
 	tSet := trainingSet{in, out}
@@ -217,13 +220,13 @@ func testDarwinWoodTraining() {
 }
 
 func testBackPropTraining() {
-	layersLength := []int{2, 4, 4, 4, 1}
+	layersLength := []int{2, 2, 1}
 	layersActivate := []ActivationFunction{Identity, Sigmoid, Sigmoid, Sigmoid, Sigmoid}
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
-	net := initRandom(layersLength, 0.2, layersActivate)
-	trainBackPropagate(net, &tSet, 0.6, 10000016, true)
+	net := initRandom(layersLength, true, layersActivate)
+	trainBackPropagate(net, &tSet, 0.6, 20001, true)
 	seeNet(*net)
 }
 
