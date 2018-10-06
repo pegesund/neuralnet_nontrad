@@ -2,18 +2,6 @@ package main
 
 import "fmt"
 
-/*
-	sets the error value in neurones in last layer
-*/
-func calcErrorInLastLayer2(net *net, tSet *trainingSet, tSetNumber int) {
-	lastLayer := &net.layers[len(net.layers)-1]
-	// fmt.Printf("Len last last layer: %d   len tset.out: %d: \n", len(lastLayer.neurons), len(tSet.out))
-	for i := 0; i < len(tSet.out[tSetNumber]); i++ {
-		loss := calcLossSquared(lastLayer.neurons[i].out, tSet.out[tSetNumber][i])
-		fmt.Println("Loss: ", loss, " - training: ", tSet.out[tSetNumber][i])
-		lastLayer.neurons[i].err = loss
-	}
-}
 
 func setErrorInLastLayer(net *net, tSet *trainingSet, tSetNumber int) {
 	lastLayer := &net.layers[len(net.layers)-1]
@@ -62,5 +50,5 @@ func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations i
 		backPropagate(net, tSet, tSetNumber, alpha)
 		tSetNumber = (tSetNumber + 1) % len(tSet.in)
 	}
-	fmt.Printf("End cost %.13f \n", calcCostSquared(net, tSet, -1))
+	// fmt.Printf("End cost %.13f \n", calcCostSquared(net, tSet, -1))
 }
