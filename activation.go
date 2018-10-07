@@ -38,7 +38,9 @@ func activateSoftMax(val float64) float64 {
 }
 
 func activateSoftMaxPrime(val float64) float64 {
-	return val * (1 - val)
+	// Return val * (1 - val)
+	// Return cross entropy derived, which is expected - out
+	return -1
 }
 
 func calcLossSquared(expected float64, out float64) float64 {
@@ -64,4 +66,21 @@ func calcCostSquared(net *net, tSet *trainingSet, maxCheck int) float64 {
 		}
 	}
 	return sum / float64(counter)
+}
+
+func calcCrossEntropy(net *net, tSet *trainingSet, maxCheck int) float64 {
+	counter, sum := 0, 0.0
+	lastLayer := &net.layers[len(net.layers)-1]
+	for i := 0; i < len(tSet.out); i++ {
+		for j := 0; j < len(lastLayer.neurons); j++ {
+			setInputFirstLayer(net, tSet.out[i])
+			feedForward(net)
+			counter++
+			if counter == maxCheck {
+				break
+			}
+			sum += math.Log(tSet.out[i][j] * lastLayer.neurons[j].out)
+		}
+	}
+	return -sum
 }
