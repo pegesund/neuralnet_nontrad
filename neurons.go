@@ -226,7 +226,7 @@ func testBackPropTraining() {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.6, 200000000, 0.4, true)
+	trainBackPropagate(net, &tSet, 0.6, 200000, 0.4, true)
 	seeNet(*net)
 }
 

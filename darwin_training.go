@@ -57,8 +57,8 @@ func createCloneMutateAndEvaluate(net *net, training *darwinTraining) *net {
 	feedForward(net)
 	netAvgErr := averageErrorInNet(training.tSet, net, 1000)
 	for i := 0; i < training.cloneIterations && training.errPass < netAvgErr; i++ {
-		if i%1000 == 0 {
-			// fmt.Println("Counting: ", i)
+		if i%100 == 0 {
+			// fmt.Println("Counting: ", i, " average-err: ", netAvgErr)
 		}
 		clone := cloneNet(net)
 		permuteNet(clone)
