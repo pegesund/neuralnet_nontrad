@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/kr/pretty"
+	"math"
 	"math/rand"
 	"runtime"
 	"sync/atomic"
@@ -179,6 +180,9 @@ func feedForward(net *net) {
 					sum += neuronBelow.synapses[j].weight * neuronBelow.out
 				}
 			}
+			if i == 1 {
+				sum += 2
+			}
 			net.layers[i].neurons[j].in = sum
 			// fmt.Println("I is: ", i,net.activateFunc[i] )
 			// if net.layers[i].activateVal == SoftMax {
@@ -189,13 +193,23 @@ func feedForward(net *net) {
 
 		if net.layers[i].activateVal == SoftMax {
 			// fmt.Println("-- SOFTMAX")
+			max := net.layers[i].neurons[0].out
+			for k := 1; k < len(net.layers[i].neurons); k++ {
+				if net.layers[i].neurons[k].out > max {
+					max = net.layers[i].neurons[k].out
+				}
+			}
+
 			softMaxSum := 0.0
 			for k := 0; k < len(net.layers[i].neurons); k++ {
+				net.layers[i].neurons[k].out = math.Exp(net.layers[i].neurons[k].out - max)
 				softMaxSum += net.layers[i].neurons[k].out
 				// fmt.Println("Out: ", net.layers[i].neurons[k].out)
 			}
 			for k := 0; k < len(net.layers[i].neurons); k++ {
-				net.layers[i].neurons[k].out = net.layers[i].neurons[k].out / softMaxSum
+				newOut := net.layers[i].neurons[k].out / softMaxSum
+				// fmt.Println("Newout: ", newOut)
+				net.layers[i].neurons[k].out = newOut
 			}
 			// seeInputOutput(*net)
 		}

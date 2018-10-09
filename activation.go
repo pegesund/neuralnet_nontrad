@@ -34,14 +34,11 @@ func activateTanhPrime(val float64) float64 {
 }
 
 func activateSoftMax(val float64) float64 {
-	return math.Exp(val)
+	return val // calculate this in feed forward layer logic, keep for now
 }
 
 func activateSoftMaxPrime(val float64) float64 {
-	// return val * (1 - val)
-	// Return cross entropy derived, which is expected - out
-	// return 1
-	return val - 1
+	return val * (1 - val)
 }
 
 func calcLossSquared(expected float64, out float64) float64 {
@@ -84,7 +81,7 @@ func calcCrossEntropy(net *net, tSet *trainingSet, maxCheck int) float64 {
 			// diff := tSet.out[i][j] * lastLayer.neurons[j].out
 			// l := math.Log(diff)
 			// fmt.Printf("Diff: %f  - log: %f \n", diff, l)
-			sum += math.Log(tSet.out[i][j] * lastLayer.neurons[j].out)
+			sum += math.Log(lastLayer.neurons[j].out) * tSet.out[i][j]
 		}
 	}
 	return -sum
