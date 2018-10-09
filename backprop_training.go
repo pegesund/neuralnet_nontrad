@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+var bias = 2.0
+
 func setErrorInLastLayer(net *net, tSet *trainingSet, tSetNumber int) {
 	lastLayer := &net.layers[len(net.layers)-1]
 	for i := 0; i < len(tSet.out[tSetNumber]); i++ {

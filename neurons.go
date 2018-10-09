@@ -74,13 +74,16 @@ func initRandom(layersLen []int, bias bool, layersActivateVals []ActivationFunct
 		neuroneLen := layersLen[i]
 		activate, activatePrime := getActivationFunction(layersActivateVals[i])
 		var biasUnitAdd int
-		if !bias || i == len(layersLen)-1 || i == 0 {
+		if !bias || i == len(layersLen)-1 {
 			biasUnitAdd = 0
 		} else {
 			biasUnitAdd = 1
 		} // do not add bias in first or last layer
 		layer := layer{make([]neuron, neuroneLen+biasUnitAdd),
 			activate, layersActivateVals[i], activatePrime}
+		if i == 0 && bias {
+			layer.neurons[neuroneLen].out = randomVal()
+		}
 		for j, _ := range layer.neurons {
 			if i < len(net.layers)-1 {
 				synapses := make([]synapse, layersLen[i+1])
@@ -181,7 +184,7 @@ func feedForward(net *net) {
 				}
 			}
 			if i == 1 {
-				sum += 2
+				sum += bias
 			}
 			net.layers[i].neurons[j].in = sum
 			// fmt.Println("I is: ", i,net.activateFunc[i] )

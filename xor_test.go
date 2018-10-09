@@ -97,8 +97,8 @@ func TestXorBackpropSoftmax(t *testing.T) {
 	out := [][]float64{{1, 0}, {0, 1}, {0, 1}, {1, 0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.4, 10000001, 0, true)
-	// cost := calcCrossEntropy(net, &tSet, -1)
-	// assert.True(t, cost < 0.0001)
+	trainBackPropagate(net, &tSet, 0.4, 1000003, 0, true)
+	cost := calcCrossEntropy(net, &tSet, -1)
+	assert.True(t, cost < 0.01)
 	seeInputOutput(*net)
 }
