@@ -39,10 +39,10 @@ func activateSoftMax(val float64) float64 {
 
 // this function is currently not used, keep for further testing
 func activateSoftMaxPrime(val float64) float64 {
-	return val * (1 - val)
+	return 1 // placeholder for
 }
 
-func softMaxPrimeBetter(layer *layer) {
+func softMaxPrimeReal(layer *layer) {
 	for i := 0; i < len(layer.neurons); i++ {
 		layer.neurons[i].err = -layer.neurons[i].err / float64(len(layer.neurons))
 	}

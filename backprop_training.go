@@ -20,7 +20,7 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64, m
 	setErrorInLastLayer(net, tSet, tSetNumber)
 	for i := 0; i < len(lastLayer.neurons); i++ {
 		if lastLayer.activateVal == SoftMax {
-			softMaxPrimeBetter(lastLayer)
+			softMaxPrimeReal(lastLayer)
 		} else {
 			lastLayer.neurons[i].err = lastLayer.activatePrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
 		}
