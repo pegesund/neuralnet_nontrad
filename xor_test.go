@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"math/rand"
 	"testing"
 )
 
@@ -11,7 +12,7 @@ import (
    simple test with only mutations of one net
 */
 
-func TestXor(t *testing.T) {
+func testXor(t *testing.T) {
 	layersLength := []int{2, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
 	wood := createWood(3, layersLength, false, layersActivate)
@@ -37,7 +38,7 @@ func TestXor(t *testing.T) {
 	Restructure output and darwinTraining data to two neurons
 	Zero is represented as {1,0} and one as {0,1}
 */
-func TestXorSoftMax(t *testing.T) {
+func testXorSoftMax(t *testing.T) {
 	layersLength := []int{2, 3, 3, 3, 2}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, SoftMax}
 	wood := createWood(3, layersLength, false, layersActivate)
@@ -71,20 +72,32 @@ func testBackPropTrainingXor1(t *testing.T) {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.001, 1000000, 0, true)
+	trainBackPropagate(net, &tSet, 0.4, 1000000, 0, false)
 	cost := calcCostSquared(net, &tSet, -1)
-	fmt.Println("Cost: ", cost)
 	assert.True(t, cost < 0.0001)
 }
 
 func testBackPropTrainingXor2(t *testing.T) {
+	rand.Seed(0)
 	layersLength := []int{2, 3, 3, 3, 3, 1}
-	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Sigmoid}
+	layersActivate := []ActivationFunction{Identity, Sigmoid, Sigmoid, Sigmoid, Sigmoid, Sigmoid}
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.0001, 100000, 0, false)
+	trainBackPropagate(net, &tSet, 0.6, 10000000, 0.4, false)
 	cost := calcCostSquared(net, &tSet, -1)
-	assert.True(t, cost < 0.001)
+	assert.True(t, cost < 0.01)
+}
+
+func TestXorBackpropSoftmax(t *testing.T) {
+	layersLength := []int{2, 3, 2}
+	layersActivate := []ActivationFunction{Identity, Tanh, SoftMax}
+	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
+	out := [][]float64{{1, 0}, {0, 1}, {0, 1}, {1, 0}}
+	tSet := trainingSet{in, out}
+	net := initRandom(layersLength, true, layersActivate)
+	trainBackPropagate(net, &tSet, 0.4, 10000, 0, true)
+	cost := calcCrossEntropy(net, &tSet, -1)
+	assert.True(t, cost < 0.0001)
 }

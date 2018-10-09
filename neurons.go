@@ -28,13 +28,17 @@ func random(a, b float64) float64 {
 // Function to see values in first and last layer
 func seeInputOutput(net net) {
 	netSize := len(net.layers)
-	for i, n := range net.layers[0].neurons {
-		fmt.Print(i, " - ", n.out, " ,  ")
+	fmt.Print("{")
+	for _, n := range net.layers[0].neurons {
+		fmt.Printf("%f ,", n.in)
 	}
-	fmt.Println()
-	for i, n := range net.layers[netSize-1].neurons {
-		fmt.Println(i, " - ", n.out, " ,  ")
+	fmt.Println("}")
+	fmt.Print("{")
+	for _, n := range net.layers[netSize-1].neurons {
+		fmt.Printf("%f , ", n.out)
 	}
+	fmt.Println("}")
+
 }
 
 func getLayersActivateVal(net *net) []ActivationFunction {
@@ -177,17 +181,23 @@ func feedForward(net *net) {
 			}
 			net.layers[i].neurons[j].in = sum
 			// fmt.Println("I is: ", i,net.activateFunc[i] )
+			// if net.layers[i].activateVal == SoftMax {
+			// 	fmt.Println("Before activate: ", sum)
+			// }
 			net.layers[i].neurons[j].out = net.layers[i].activateFunc(sum)
 		}
 
 		if net.layers[i].activateVal == SoftMax {
+			// fmt.Println("-- SOFTMAX")
 			softMaxSum := 0.0
 			for k := 0; k < len(net.layers[i].neurons); k++ {
 				softMaxSum += net.layers[i].neurons[k].out
+				// fmt.Println("Out: ", net.layers[i].neurons[k].out)
 			}
 			for k := 0; k < len(net.layers[i].neurons); k++ {
 				net.layers[i].neurons[k].out = net.layers[i].neurons[k].out / softMaxSum
 			}
+			// seeInputOutput(*net)
 		}
 	}
 	// seeNet(*net)
