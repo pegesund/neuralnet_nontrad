@@ -48,12 +48,9 @@ func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations i
 	tSetNumber := 0
 	for i := 1; i <= iterations; i++ {
 		if i%10000 == 0 && printInfo {
-			// fmt.Printf("Iteration: %d cost %.13f \n", i, calcCostSquared(net, tSet, -1))
 			fmt.Printf("Iteration: %d cost %.13f \n", i, calcCrossEntropy(net, tSet, -1))
 		}
 		backPropagate(net, tSet, tSetNumber, alpha, momemtum)
-		// seeInputOutput(*net)
 		tSetNumber = (tSetNumber + 1) % len(tSet.in)
 	}
-	// fmt.Printf("End cost %.13f \n", calcCostSquared(net, tSet, -1))
 }

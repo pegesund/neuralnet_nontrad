@@ -41,7 +41,7 @@ func TestXor(t *testing.T) {
 func TestXorSoftMax(t *testing.T) {
 	layersLength := []int{2, 3, 3, 3, 2}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, SoftMax}
-	wood := createWood(3, layersLength, false, layersActivate)
+	wood := createWood(3, layersLength, true, layersActivate)
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
 	out := [][]float64{{1, 0}, {0, 1}, {0, 1}, {1, 0}}
 	//in := [][]float64{{0, 0}, {1, 1}}
@@ -51,6 +51,7 @@ func TestXorSoftMax(t *testing.T) {
 	net := createCloneMutateAndEvaluate(wood.nets[0], &training)
 	assert.True(t, net.error < 0.3, "Error to high in softmax")
 	predict([]float64{0, 0}, net)
+	seeInputOutput(*net)
 	assert.True(t, net.layers[len(net.layersLength)-1].neurons[0].out > 0.99)
 	assert.True(t, net.layers[len(net.layersLength)-1].neurons[1].out < 0.01)
 	predict([]float64{1, 0}, net)
@@ -72,7 +73,7 @@ func TestBackPropTrainingXor1(t *testing.T) {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.4, 1000000, 0, false)
+	trainBackPropagate(net, &tSet, 0.4, 1000001, 0, false)
 	cost := calcCostSquared(net, &tSet, -1)
 	assert.True(t, cost < 0.0001)
 }

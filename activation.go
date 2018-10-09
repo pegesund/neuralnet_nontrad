@@ -78,11 +78,26 @@ func calcCrossEntropy(net *net, tSet *trainingSet, maxCheck int) float64 {
 			if counter == maxCheck {
 				break
 			}
-			// diff := tSet.out[i][j] * lastLayer.neurons[j].out
-			// l := math.Log(diff)
-			// fmt.Printf("Diff: %f  - log: %f \n", diff, l)
 			sum += math.Log(lastLayer.neurons[j].out) * tSet.out[i][j]
 		}
 	}
 	return -sum
+}
+
+func feedForwardSoftMax(net *net, i int) {
+	max := net.layers[i].neurons[0].out
+	for k := 1; k < len(net.layers[i].neurons); k++ {
+		if net.layers[i].neurons[k].out > max {
+			max = net.layers[i].neurons[k].out
+		}
+	}
+	softMaxSum := 0.0
+	for k := 0; k < len(net.layers[i].neurons); k++ {
+		net.layers[i].neurons[k].out = math.Exp(net.layers[i].neurons[k].out - max)
+		softMaxSum += net.layers[i].neurons[k].out
+	}
+	for k := 0; k < len(net.layers[i].neurons); k++ {
+		newOut := net.layers[i].neurons[k].out / softMaxSum
+		net.layers[i].neurons[k].out = newOut
+	}
 }
