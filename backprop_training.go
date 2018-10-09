@@ -19,7 +19,11 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64, m
 	lastLayer := &net.layers[len(net.layers)-1]
 	setErrorInLastLayer(net, tSet, tSetNumber)
 	for i := 0; i < len(lastLayer.neurons); i++ {
-		lastLayer.neurons[i].err = lastLayer.activatePrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
+		if lastLayer.activateVal == SoftMax {
+			softMaxPrimeBetter(lastLayer)
+		} else {
+			lastLayer.neurons[i].err = lastLayer.activatePrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
+		}
 	}
 
 	// calc and propagete error backwards from last layer

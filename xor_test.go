@@ -12,7 +12,7 @@ import (
    simple test with only mutations of one net
 */
 
-func TestXor(t *testing.T) {
+func TestXorDarwin(t *testing.T) {
 	layersLength := []int{2, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
 	wood := createWood(3, layersLength, false, layersActivate)
@@ -38,7 +38,7 @@ func TestXor(t *testing.T) {
 	Restructure output and darwinTraining data to two neurons
 	Zero is represented as {1,0} and one as {0,1}
 */
-func TestXorSoftMax(t *testing.T) {
+func TestXorSoftMaxDarwin(t *testing.T) {
 	layersLength := []int{2, 3, 3, 3, 2}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, SoftMax}
 	wood := createWood(3, layersLength, true, layersActivate)
@@ -99,6 +99,8 @@ func TestXorBackpropSoftmax(t *testing.T) {
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
 	trainBackPropagate(net, &tSet, 0.4, 1000005, 0, false)
+	seeInputOutput(*net)
 	cost := calcCrossEntropy(net, &tSet, -1)
 	assert.True(t, cost < 0.01)
+
 }
