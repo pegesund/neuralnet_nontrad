@@ -12,7 +12,7 @@ import (
    simple test with only mutations of one net
 */
 
-func testXor(t *testing.T) {
+func TestXor(t *testing.T) {
 	layersLength := []int{2, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh}
 	wood := createWood(3, layersLength, false, layersActivate)
@@ -38,7 +38,7 @@ func testXor(t *testing.T) {
 	Restructure output and darwinTraining data to two neurons
 	Zero is represented as {1,0} and one as {0,1}
 */
-func testXorSoftMax(t *testing.T) {
+func TestXorSoftMax(t *testing.T) {
 	layersLength := []int{2, 3, 3, 3, 2}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, SoftMax}
 	wood := createWood(3, layersLength, false, layersActivate)
@@ -65,7 +65,7 @@ func testXorSoftMax(t *testing.T) {
 	fmt.Println(wood)
 }
 
-func testBackPropTrainingXor1(t *testing.T) {
+func TestBackPropTrainingXor1(t *testing.T) {
 	layersLength := []int{2, 3, 3, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
 	in := [][]float64{{0, 0}, {0, 1}, {1, 0}, {1, 1}}
@@ -77,7 +77,7 @@ func testBackPropTrainingXor1(t *testing.T) {
 	assert.True(t, cost < 0.0001)
 }
 
-func testBackPropTrainingXor2(t *testing.T) {
+func TestBackPropTrainingXor2(t *testing.T) {
 	rand.Seed(0)
 	layersLength := []int{2, 3, 3, 3, 3, 1}
 	layersActivate := []ActivationFunction{Identity, Sigmoid, Sigmoid, Sigmoid, Sigmoid, Sigmoid}
@@ -97,8 +97,7 @@ func TestXorBackpropSoftmax(t *testing.T) {
 	out := [][]float64{{1, 0}, {0, 1}, {0, 1}, {1, 0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.4, 1000003, 0, true)
+	trainBackPropagate(net, &tSet, 0.4, 1000005, 0, false)
 	cost := calcCrossEntropy(net, &tSet, -1)
 	assert.True(t, cost < 0.01)
-	seeInputOutput(*net)
 }
