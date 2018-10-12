@@ -229,13 +229,22 @@ func testBackPropTraining() {
 	seeNet(*net)
 }
 
+func testMnist() {
+	layersLength := []int{784, 100, 10}
+	layersActivate := []ActivationFunction{Identity, Sigmoid, SoftMax}
+	net := initRandom(layersLength, true, layersActivate)
+	tSet := createMnistDataset("/var/tmp/mnist_test.csv")
+	trainBackPropagate(net, &tSet, 0.6, 100000000, 0.4, true)
+}
+
 func main() {
 	fmt.Println("Ok, starting")
 	start := time.Now()
 	// rand.Seed(time.Now().UTC().UnixNano())
 	rand.Seed(0)
 	// testDarwinWoodTraining()
-	testBackPropTraining()
+	// testBackPropTraining()
+	testMnist()
 	elapsed := time.Since(start)
 	fmt.Printf("\n Time took %s", elapsed)
 }

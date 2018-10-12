@@ -14,13 +14,14 @@ func setErrorInLastLayer(net *net, tSet *trainingSet, tSetNumber int) {
 
 func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64, momentum float64) {
 	setInputFirstLayer(net, tSet.in[tSetNumber])
-	// fmt.Println("--- FEEDING FORWARD")
 	feedForward(net)
 	lastLayer := &net.layers[len(net.layers)-1]
 	setErrorInLastLayer(net, tSet, tSetNumber)
 	for i := 0; i < len(lastLayer.neurons); i++ {
 		if lastLayer.activateVal == SoftMax {
 			softMaxPrimeReal(lastLayer)
+			// seeInputOutput(*net)
+			// lastLayer.neurons[i].err = activateSigmoidPrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
 		} else {
 			lastLayer.neurons[i].err = lastLayer.activatePrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
 		}
@@ -50,9 +51,11 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64, m
 
 func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations int, momemtum float64, printInfo bool) {
 	tSetNumber := 0
-	for i := 1; i <= iterations; i++ {
-		if i%10000 == 0 && printInfo {
-			fmt.Printf("Iteration: %d cost %.13f \n", i, calcCrossEntropy(net, tSet, -1))
+	fmt.Println("Starting backprop")
+	for i := 0; i <= iterations; i++ {
+		if i%1000 == 0 && i > -1 && printInfo {
+			fmt.Printf("Iteration: %d cost %.13f - %d \n", i, calcCrossEntropy(net, tSet, 50),
+				correctNumberOfPredictions(net, tSet, -1))
 		}
 		backPropagate(net, tSet, tSetNumber, alpha, momemtum)
 		tSetNumber = (tSetNumber + 1) % len(tSet.in)

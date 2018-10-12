@@ -44,7 +44,8 @@ func activateSoftMaxPrime(val float64) float64 {
 
 func softMaxPrimeReal(layer *layer) {
 	for i := 0; i < len(layer.neurons); i++ {
-		layer.neurons[i].err = -layer.neurons[i].err / float64(len(layer.neurons))
+		// fmt.Println("Err: ", layer.neurons[i].err, len(layer.neurons))
+		layer.neurons[i].err = (-layer.neurons[i].err / float64(len(layer.neurons))) * layer.neurons[i].in
 	}
 }
 
@@ -73,34 +74,63 @@ func calcCostSquared(net *net, tSet *trainingSet, maxCheck int) float64 {
 	return sum / float64(counter)
 }
 
+func correctNumberOfPredictions(net *net, tSet *trainingSet, maxCheck int) int {
+	counter, sum := 0, 0
+	for i := 0; i < len(tSet.out); i++ {
+		setInputFirstLayer(net, tSet.in[i])
+		feedForward(net)
+		lastLayer := &net.layers[len(net.layers)-1]
+		maxOut, maxTset := 0.0, 0.0
+		maxOutCounter, maxTsetCounter := 0, 0
+		for j := 0; j < len(lastLayer.neurons); j++ {
+			if maxOut < lastLayer.neurons[j].out {
+				maxOut = lastLayer.neurons[j].out
+				maxOutCounter = j
+			}
+			if maxTset < lastLayer.neurons[j].out {
+				maxTset = tSet.out[i][j]
+				maxTsetCounter = j
+			}
+		}
+		if maxTsetCounter == maxOutCounter {
+			sum++
+		}
+		counter++
+		if counter == maxCheck {
+			break
+		}
+
+	}
+	return sum
+}
+
 func calcCrossEntropy(net *net, tSet *trainingSet, maxCheck int) float64 {
 	counter, sum := 0, 0.0
-	lastLayer := &net.layers[len(net.layers)-1]
 	for i := 0; i < len(tSet.out); i++ {
+		setInputFirstLayer(net, tSet.in[i])
+		feedForward(net)
+		lastLayer := &net.layers[len(net.layers)-1]
 		for j := 0; j < len(lastLayer.neurons); j++ {
-			setInputFirstLayer(net, tSet.in[i])
-			feedForward(net)
-			// seeInputOutput(*net)
-			counter++
-			if counter == maxCheck {
-				break
-			}
 			sum += math.Log(lastLayer.neurons[j].out) * tSet.out[i][j]
+		}
+		counter++
+		if counter == maxCheck {
+			break
 		}
 	}
 	return -sum
 }
 
 func feedForwardSoftMax(net *net, i int) {
-	max := net.layers[i].neurons[0].out
+	max := net.layers[i].neurons[0].in
 	for k := 1; k < len(net.layers[i].neurons); k++ {
-		if net.layers[i].neurons[k].out > max {
-			max = net.layers[i].neurons[k].out
+		if net.layers[i].neurons[k].in > max {
+			max = net.layers[i].neurons[k].in
 		}
 	}
 	softMaxSum := 0.0
 	for k := 0; k < len(net.layers[i].neurons); k++ {
-		net.layers[i].neurons[k].out = math.Exp(net.layers[i].neurons[k].out - max)
+		net.layers[i].neurons[k].out = math.Exp(net.layers[i].neurons[k].in - 0)
 		softMaxSum += net.layers[i].neurons[k].out
 	}
 	for k := 0; k < len(net.layers[i].neurons); k++ {
