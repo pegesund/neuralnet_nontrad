@@ -43,10 +43,19 @@ func activateSoftMaxPrime(val float64) float64 {
 }
 
 func softMaxPrimeReal(layer *layer) {
+
 	for i := 0; i < len(layer.neurons); i++ {
 		// fmt.Println("Err: ", layer.neurons[i].err, len(layer.neurons))
-		layer.neurons[i].err = (-layer.neurons[i].err / float64(len(layer.neurons))) * layer.neurons[i].in
+		layer.neurons[i].err = layer.neurons[i].err / float64(len(layer.neurons))
 	}
+
+	/*
+		for i := range layer.neurons {
+			fmt.Printf(", %f", layer.neurons[i].out)
+		}
+		fmt.Println("")
+	*/
+
 }
 
 func calcLossSquared(expected float64, out float64) float64 {
@@ -130,7 +139,7 @@ func feedForwardSoftMax(net *net, i int) {
 	}
 	softMaxSum := 0.0
 	for k := 0; k < len(net.layers[i].neurons); k++ {
-		net.layers[i].neurons[k].out = math.Exp(net.layers[i].neurons[k].in - 0)
+		net.layers[i].neurons[k].out = math.Exp(net.layers[i].neurons[k].in - max)
 		softMaxSum += net.layers[i].neurons[k].out
 	}
 	for k := 0; k < len(net.layers[i].neurons); k++ {

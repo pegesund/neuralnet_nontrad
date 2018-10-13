@@ -58,7 +58,7 @@ func getActivationFunction(a ActivationFunction) (func(float64) float64, func(fl
 	case Sigmoid:
 		return activateSigmoid, activateSigmoidPrime
 	case SoftMax:
-		return activateSoftMax, activateSoftMaxPrime
+		return activateSoftMax, activateIdentity
 	}
 	return nil, nil
 }
@@ -231,7 +231,7 @@ func testBackPropTraining() {
 
 func testMnist() {
 	layersLength := []int{784, 100, 10}
-	layersActivate := []ActivationFunction{Identity, Sigmoid, SoftMax}
+	layersActivate := []ActivationFunction{Identity, Tanh, SoftMax}
 	net := initRandom(layersLength, true, layersActivate)
 	tSet := createMnistDataset("/var/tmp/mnist_test.csv")
 	trainBackPropagate(net, &tSet, 0.6, 100000000, 0.4, true)

@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 var bias = 2.0
 
@@ -17,13 +20,13 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64, m
 	feedForward(net)
 	lastLayer := &net.layers[len(net.layers)-1]
 	setErrorInLastLayer(net, tSet, tSetNumber)
-	for i := 0; i < len(lastLayer.neurons); i++ {
-		if lastLayer.activateVal == SoftMax {
-			softMaxPrimeReal(lastLayer)
-			// seeInputOutput(*net)
-			// lastLayer.neurons[i].err = activateSigmoidPrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
-		} else {
-			lastLayer.neurons[i].err = lastLayer.activatePrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
+	if lastLayer.activateVal == SoftMax {
+		softMaxPrimeReal(lastLayer)
+	} else {
+		for i := 0; i < len(lastLayer.neurons); i++ {
+			{
+				lastLayer.neurons[i].err = lastLayer.activatePrime(lastLayer.neurons[i].out) * lastLayer.neurons[i].err
+			}
 		}
 	}
 
@@ -58,6 +61,7 @@ func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations i
 				correctNumberOfPredictions(net, tSet, -1))
 		}
 		backPropagate(net, tSet, tSetNumber, alpha, momemtum)
-		tSetNumber = (tSetNumber + 1) % len(tSet.in)
+		// tSetNumber = (tSetNumber + 1) % len(tSet.in)
+		tSetNumber = rand.Intn(len(tSet.in))
 	}
 }
