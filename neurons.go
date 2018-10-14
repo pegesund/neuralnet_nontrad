@@ -233,8 +233,8 @@ func testMnist() {
 	layersLength := []int{784, 100, 10}
 	layersActivate := []ActivationFunction{Identity, Tanh, SoftMax}
 	net := initRandom(layersLength, true, layersActivate)
-	tSetTrain := createMnistDataset("/var/tmp/mnist_train.csv")
-	tSetTest := createMnistDataset("/var/tmp/mnist_test.csv")
+	tSetTrain := createMnistDataset("data/mnist_train.csv")
+	tSetTest := createMnistDataset("data/mnist_test.csv")
 
 	trainBackPropagate(net, &tSetTrain, &tSetTest, 0.6, 100000000, 0.4, true)
 }
