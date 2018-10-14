@@ -225,7 +225,7 @@ func testBackPropTraining() {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.6, 200000, 0.4, true)
+	trainBackPropagate(net, &tSet, nil, 0.6, 200000, 0.4, true)
 	seeNet(*net)
 }
 
@@ -233,8 +233,10 @@ func testMnist() {
 	layersLength := []int{784, 100, 10}
 	layersActivate := []ActivationFunction{Identity, Tanh, SoftMax}
 	net := initRandom(layersLength, true, layersActivate)
-	tSet := createMnistDataset("/var/tmp/mnist_test.csv")
-	trainBackPropagate(net, &tSet, 0.6, 100000000, 0.4, true)
+	tSetTrain := createMnistDataset("/var/tmp/mnist_train.csv")
+	tSetTest := createMnistDataset("/var/tmp/mnist_test.csv")
+
+	trainBackPropagate(net, &tSetTrain, &tSetTest, 0.6, 100000000, 0.4, true)
 }
 
 func main() {

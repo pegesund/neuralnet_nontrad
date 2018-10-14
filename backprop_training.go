@@ -52,13 +52,18 @@ func backPropagate(net *net, tSet *trainingSet, tSetNumber int, alpha float64, m
 	}
 }
 
-func trainBackPropagate(net *net, tSet *trainingSet, alpha float64, iterations int, momemtum float64, printInfo bool) {
+func trainBackPropagate(net *net, tSet *trainingSet, tSetTest *trainingSet, alpha float64, iterations int, momemtum float64, printInfo bool) {
 	tSetNumber := 0
 	fmt.Println("Starting backprop")
 	for i := 0; i <= iterations; i++ {
 		if i%1000 == 0 && i > -1 && printInfo {
-			fmt.Printf("Iteration: %d cost %.13f - %d \n", i, calcCrossEntropy(net, tSet, 50),
+			fmt.Printf("Iteration: %d cost %.13f - %d", i, calcCrossEntropy(net, tSet, 50),
 				correctNumberOfPredictions(net, tSet, -1))
+			if tSetTest != nil {
+				fmt.Printf(" - %f", float64(correctNumberOfPredictions(net, tSetTest, -1))/
+					float64(len(tSetTest.out)))
+			}
+			fmt.Println()
 		}
 		backPropagate(net, tSet, tSetNumber, alpha, momemtum)
 		// tSetNumber = (tSetNumber + 1) % len(tSet.in)

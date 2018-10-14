@@ -73,7 +73,7 @@ func TestBackPropTrainingXor1(t *testing.T) {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.4, 1000001, 0, false)
+	trainBackPropagate(net, &tSet, nil, 0.4, 1000001, 0, false)
 	cost := calcCostSquared(net, &tSet, -1)
 	assert.True(t, cost < 0.0001)
 }
@@ -86,7 +86,7 @@ func TestBackPropTrainingXor2(t *testing.T) {
 	out := [][]float64{{0}, {1}, {1}, {0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.6, 10000000, 0.4, false)
+	trainBackPropagate(net, &tSet, nil, 0.6, 10000000, 0.4, false)
 	cost := calcCostSquared(net, &tSet, -1)
 	assert.True(t, cost < 0.01)
 }
@@ -98,9 +98,8 @@ func TestXorBackpropSoftmax(t *testing.T) {
 	out := [][]float64{{1, 0}, {0, 1}, {0, 1}, {1, 0}}
 	tSet := trainingSet{in, out}
 	net := initRandom(layersLength, true, layersActivate)
-	trainBackPropagate(net, &tSet, 0.4, 1000005, 0, true)
+	trainBackPropagate(net, &tSet, nil, 0.4, 1000005, 0, true)
 	seeInputOutput(*net)
 	cost := calcCrossEntropy(net, &tSet, -1)
 	assert.True(t, cost < 0.01)
-
 }
