@@ -62,6 +62,10 @@ func calcLossSquared(expected float64, out float64) float64 {
 	return math.Pow(expected-out, 2)
 }
 
+func calcLossCrossEntropy(expected float64, out float64) float64 {
+	return math.Log(out) * expected
+}
+
 /*
 	Calc loss squared against a training set, start from beginning
     maxCheck iterations, -1 for all
