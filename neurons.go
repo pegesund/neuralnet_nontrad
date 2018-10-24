@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/kr/pretty"
 	"math/rand"
 	"runtime"
 	"sync/atomic"
 	"time"
+
+	"github.com/kr/pretty"
 )
 
 func seeNet(net net) {
@@ -244,7 +245,7 @@ func main() {
 	start := time.Now()
 	// rand.Seed(time.Now().UTC().UnixNano())
 	rand.Seed(0)
-	// testDarwinWoodTraining()
+	// testDarwinWoodTraining() this is a editor test..
 	// testBackPropTraining()
 	testMnist()
 	elapsed := time.Since(start)
