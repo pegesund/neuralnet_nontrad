@@ -152,7 +152,11 @@ func calcError(net *net, expectedResult []float64) float64 {
 	netSize := len(net.layers)
 	var e float64 = 0
 	for i := 0; i < len(net.layers[netSize-1].neurons); i++ {
-		e += calcLossSquared(net.layers[netSize-1].neurons[i].out, expectedResult[i])
+		if net.layers[len(net.layers)-1].activateVal == SoftMax {
+			e -= calcLossCrossEntropy(expectedResult[i], net.layers[netSize-1].neurons[i].out)
+		} else {
+			e += calcLossSquared(net.layers[netSize-1].neurons[i].out, expectedResult[i])
+		}
 	}
 	net.error = e
 	return e
@@ -207,8 +211,8 @@ func benchmarkClone(net *net) {
 }
 
 func testDarwinWoodTraining() {
-	layersLength := []int{2, 3, 3, 3, 3, 1}
-	layersActivate := []ActivationFunction{Identity, Tanh, Tanh, Tanh, Tanh, Tanh}
+	layersLength := []int{2, 3, 1}
+	layersActivate := []ActivationFunction{Identity, Sigmoid, Sigmoid}
 	wood := createWood(50, layersLength, false, layersActivate)
 	in := [][]float64{{0, 1}, {0, 1}, {1, 0}, {1, 0}}
 	out := [][]float64{{0}, {0}, {1}, {1}}
@@ -245,9 +249,13 @@ func main() {
 	start := time.Now()
 	// rand.Seed(time.Now().UTC().UnixNano())
 	rand.Seed(0)
+<<<<<<< HEAD
 	// testDarwinWoodTraining() this is a editor test..
+=======
+	testDarwinWoodTraining()
+>>>>>>> 088e17fec9700bff43ce68025b88f26f91973545
 	// testBackPropTraining()
-	testMnist()
+	// testMnist()
 	elapsed := time.Since(start)
 	fmt.Printf("\n Time took %s", elapsed)
 }
