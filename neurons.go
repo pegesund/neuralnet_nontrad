@@ -78,7 +78,7 @@ func initRandom(layersLen []int, bias bool, layersActivateVals []ActivationFunct
 			biasUnitAdd = 0
 		} else {
 			biasUnitAdd = 1
-		} // do not add bias in first or last layer
+		} // do not add bias inlast layer
 		layer := layer{make([]neuron, neuroneLen+biasUnitAdd),
 			activate, layersActivateVals[i], activatePrime}
 		if i == 0 && bias {
