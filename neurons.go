@@ -150,7 +150,7 @@ func cloneNet(oldNet *net) *net {
 
 func calcError(net *net, expectedResult []float64) float64 {
 	netSize := len(net.layers)
-	var e float64 = 0
+	var e float64
 	for i := 0; i < len(net.layers[netSize-1].neurons); i++ {
 		e += calcLossSquared(net.layers[netSize-1].neurons[i].out, expectedResult[i])
 	}

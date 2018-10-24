@@ -16,8 +16,8 @@ import (
 */
 
 var maxConcurrent = 100
-var winners uint64 = 0
-var cloneCounter uint64 = 0
+var winners uint64
+var cloneCounter uint64
 var mutateJobs = make(chan *trainMsg)
 var mutateResults = make(chan *trainMsg)
 var wg sync.WaitGroup

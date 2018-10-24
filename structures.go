@@ -1,5 +1,6 @@
 package main
 
+// strategy to change net
 const (
 	Increase   float64 = 1
 	Decrease   float64 = -1

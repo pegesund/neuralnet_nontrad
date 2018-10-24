@@ -4,8 +4,10 @@ import (
 	"math"
 )
 
+// ActivationFunction is the non linear activation function for the layer
 type ActivationFunction int
 
+// different types of activationsfunctions
 const (
 	Identity ActivationFunction = 0
 	Sigmoid  ActivationFunction = 1
